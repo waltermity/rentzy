@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS maintenance;
+DROP TABLE IF EXISTS rentals;
+DROP TABLE IF EXISTS reservations;
+DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS tool_items;
+DROP TABLE IF EXISTS tool_types;
+DROP TABLE IF EXISTS categories;
