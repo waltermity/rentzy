@@ -1,0 +1,66 @@
+classDiagram
+    class UserRepository {
+        <<interface>>
+        +Create(ctx, user) User
+        +GetByUsername(ctx, username) User
+        +GetByID(ctx, id) User
+        +List(ctx) []User
+        +UpdateRole(ctx, id, role) error
+        +Delete(ctx, id) error
+    }
+
+    class ToolRepository {
+        <<interface>>
+        +ListTypes(ctx) []ToolType
+        +GetTypeByID(ctx, id) ToolType
+        +CreateType(ctx, type) ToolType
+        +ListItems(ctx) []ToolItem
+        +GetItemByID(ctx, id) ToolItem
+        +GetItemByIDTx(ctx, tx, id) ToolItem
+        +CreateItem(ctx, item) ToolItem
+        +UpdateItemStatus(ctx, id, status) error
+        +UpdateItemStatusTx(ctx, tx, id, status) error
+    }
+
+    class CustomerRepository {
+        <<interface>>
+        +List(ctx) []Customer
+        +GetByID(ctx, id) Customer
+        +Create(ctx, customer) Customer
+    }
+
+    class ReservationRepository {
+        <<interface>>
+        +Create(ctx, reservation) Reservation
+        +CreateTx(ctx, tx, reservation) Reservation
+        +FindOverlapping(ctx, toolItemID, start, end) []Reservation
+        +FindOverlappingTx(ctx, tx, toolItemID, start, end) []Reservation
+        +GetByID(ctx, id) Reservation
+        +List(ctx) []Reservation
+        +UpdateStatus(ctx, id, status) error
+    }
+
+    class RentalRepository {
+        <<interface>>
+        +Create(ctx, rental) Rental
+        +CreateTx(ctx, tx, rental) Rental
+        +GetByID(ctx, id) Rental
+        +List(ctx) []Rental
+        +Update(ctx, rental) Rental
+        +UpdateTx(ctx, tx, rental) Rental
+        +FindActiveByToolItem(ctx, toolItemID) []Rental
+        +FindActiveByToolItemTx(ctx, tx, toolItemID) []Rental
+    }
+
+    class MaintenanceRepository {
+        <<interface>>
+        +List(ctx) []Maintenance
+        +Create(ctx, maintenance) Maintenance
+        +GetByID(ctx, id) Maintenance
+        +Complete(ctx, id, cost, completedAt) Maintenance
+    }
+
+    class TxManager {
+        <<interface>>
+        +WithTx(ctx, fn) error
+    }

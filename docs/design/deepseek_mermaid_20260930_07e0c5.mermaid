@@ -1,0 +1,38 @@
+sequenceDiagram
+    autonumber
+    participant Client as Frontend / curl
+    participant Gin as Gin Router
+    participant AuthMW as Auth Middleware
+    participant RoleMW as Role Middleware
+    participant Handler as RentalHandler
+    participant Svc as RentalService
+    participant Store as postgres.Store
+    participant ToolRepo as ToolRepo
+    participant RentalRepo as RentalRepo
+    participant DB as PostgreSQL
+
+    Client->>Gin: POST /api/rentals<br/>Authorization: Bearer ...
+    Gin->>AuthMW: parse JWT
+    AuthMW->>AuthMW: verify signature + exp
+    AuthMW->>AuthMW: set user_id, role in context
+    AuthMW->>RoleMW: RequireRole("ADMIN","STAFF")
+    RoleMW->>Handler: c.Next()
+    Handler->>Handler: c.ShouldBindJSON(input)
+    Handler->>Svc: Handout(ctx, input)
+    Svc->>Store: WithTx(fn)
+    Store->>DB: BEGIN SERIALIZABLE
+    Svc->>ToolRepo: GetItemByIDTx(tx, toolItemID)
+    ToolRepo->>DB: SELECT ... FOR UPDATE
+    DB-->>ToolRepo: row
+    ToolRepo-->>Svc: ToolItem
+    Svc->>Svc: business rule: rentable?
+    Svc->>ToolRepo: UpdateItemStatusTx(tx, id, RENTED)
+    ToolRepo->>DB: UPDATE tool_items SET status='RENTED'
+    Svc->>RentalRepo: CreateTx(tx, rental)
+    RentalRepo->>DB: INSERT INTO rentals RETURNING *
+    DB-->>RentalRepo: row
+    RentalRepo-->>Svc: Rental
+    Svc->>Store: return nil
+    Store->>DB: COMMIT
+    Svc-->>Handler: Rental
+    Handler->>Client: 201 Created (JSON)

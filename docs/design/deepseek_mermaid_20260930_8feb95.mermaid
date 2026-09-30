@@ -1,0 +1,82 @@
+classDiagram
+    class AuthService {
+        -users UserRepository
+        -jwtSecret []byte
+        -tokenTTL time.Duration
+        +Register(ctx, username, email, password) User
+        +Login(ctx, username, password) string
+        +issueToken(user) string
+    }
+
+    class UserService {
+        -users UserRepository
+        +Create(ctx, user) User
+        +List(ctx) []User
+        +GetByID(ctx, id) User
+        +UpdateRole(ctx, id, role) error
+        +Delete(ctx, id) error
+    }
+
+    class ToolService {
+        -tools ToolRepository
+        +ListTypes(ctx) []ToolType
+        +CreateType(ctx, type) ToolType
+        +ListItems(ctx) []ToolItem
+        +CreateItem(ctx, item) ToolItem
+        +UpdateItemStatus(ctx, id, status) error
+    }
+
+    class CustomerService {
+        -customers CustomerRepository
+        +List(ctx) []Customer
+        +GetByID(ctx, id) Customer
+        +Create(ctx, customer) Customer
+    }
+
+    class ReservationService {
+        -reservations ReservationRepository
+        -tools ToolRepository
+        -store TxManager
+        +Create(ctx, input) Reservation
+        +List(ctx) []Reservation
+        +Cancel(ctx, id) error
+    }
+
+    class RentalService {
+        -rentals RentalRepository
+        -tools ToolRepository
+        -store TxManager
+        +Handout(ctx, input) Rental
+        +Return(ctx, id, condition) Rental
+        +List(ctx) []Rental
+        +calculateFees(rental, toolType) Fees
+    }
+
+    class MaintenanceService {
+        -maintenance MaintenanceRepository
+        -tools ToolRepository
+        +List(ctx) []Maintenance
+        +Create(ctx, maintenance) Maintenance
+        +Complete(ctx, id, cost) Maintenance
+    }
+
+    class ReportService {
+        -db *sql.DB
+        +TopRented(ctx) []ReportRow
+        +Utilization(ctx) []ReportRow
+        +Revenue(ctx) []ReportRow
+        +PurchaseSuggestions(ctx) []ReportRow
+    }
+
+    AuthService --> UserRepository
+    UserService --> UserRepository
+    ToolService --> ToolRepository
+    CustomerService --> CustomerRepository
+    ReservationService --> ReservationRepository
+    ReservationService --> ToolRepository
+    ReservationService --> TxManager
+    RentalService --> RentalRepository
+    RentalService --> ToolRepository
+    RentalService --> TxManager
+    MaintenanceService --> MaintenanceRepository
+    MaintenanceService --> ToolRepository

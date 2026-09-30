@@ -1,0 +1,43 @@
+flowchart TD
+    subgraph Presentation["Presentation Layer"]
+        HANDLER[internal/http/handler]
+        ROUTER[internal/http/router]
+        MW[internal/http/middleware]
+        RESP[internal/http/respond]
+    end
+
+    subgraph Business["Business Layer"]
+        SVC[internal/service]
+    end
+
+    subgraph Data["Data Layer"]
+        REPO_IF[internal/repository<br/>interfaces]
+        REPO_PG[internal/repository/postgres<br/>implementations]
+    end
+
+    subgraph Core["Core Layer"]
+        DOM[internal/domain]
+        DB[internal/db]
+    end
+
+    MAIN[cmd/rentzy/main.go]
+
+    HANDLER --> SVC
+    HANDLER --> RESP
+    HANDLER --> DOM
+    ROUTER --> HANDLER
+    ROUTER --> MW
+    MW --> DOM
+
+    SVC --> REPO_IF
+    SVC --> DOM
+
+    REPO_PG -.implements.-> REPO_IF
+    REPO_PG --> DOM
+    REPO_PG --> DB
+
+    MAIN --> HANDLER
+    MAIN --> ROUTER
+    MAIN --> SVC
+    MAIN --> REPO_PG
+    MAIN --> DB

@@ -1,0 +1,133 @@
+classDiagram
+    class Category {
+        +int64 ID
+        +string Name
+    }
+
+    class ToolType {
+        +int64 ID
+        +string Name
+        +int64 CategoryID
+        +string Manufacturer
+        +string Model
+        +float64 PurchasePrice
+        +float64 DailyRate
+        +float64 Deposit
+    }
+
+    class ToolItem {
+        +int64 ID
+        +int64 ToolTypeID
+        +ToolStatus Status
+        +string CurrentCondition
+        +time.Time AcquiredAt
+    }
+
+    class ToolStatus {
+        <<enumeration>>
+        AVAILABLE
+        RENTED
+        MAINTENANCE
+        RETIRED
+    }
+
+    class Customer {
+        +int64 ID
+        +string Name
+        +string Email
+        +string Phone
+        +string Address
+        +time.Time CreatedAt
+    }
+
+    class Reservation {
+        +int64 ID
+        +int64 CustomerID
+        +int64 ToolItemID
+        +time.Time StartDate
+        +time.Time EndDate
+        +ReservationStatus Status
+        +time.Time CreatedAt
+    }
+
+    class ReservationStatus {
+        <<enumeration>>
+        PENDING
+        CONFIRMED
+        CANCELLED
+        EXPIRED
+    }
+
+    class Rental {
+        +int64 ID
+        +int64 CustomerID
+        +int64 ToolItemID
+        +*int64 ReservationID
+        +time.Time StartDate
+        +time.Time ExpectedEndDate
+        +*time.Time ActualEndDate
+        +float64 DepositPaid
+        +string ConditionAtHandover
+        +*string ConditionAtReturn
+        +*float64 BaseFee
+        +*float64 LateFee
+        +*float64 TotalFee
+        +RentalStatus Status
+    }
+
+    class RentalStatus {
+        <<enumeration>>
+        ACTIVE
+        RETURNED
+        OVERDUE
+        CANCELLED
+    }
+
+    class Maintenance {
+        +int64 ID
+        +int64 ToolItemID
+        +MaintenanceType Type
+        +string Description
+        +time.Time StartedAt
+        +*time.Time CompletedAt
+        +float64 Cost
+        +string PerformedBy
+    }
+
+    class MaintenanceType {
+        <<enumeration>>
+        SCHEDULED
+        REPAIR
+        INSPECTION
+    }
+
+    class User {
+        +int64 ID
+        +string Username
+        +string Email
+        +string PasswordHash
+        +Role Role
+        +time.Time CreatedAt
+    }
+
+    class Role {
+        <<enumeration>>
+        ADMIN
+        STAFF
+        CUSTOMER
+    }
+
+    Category "1" --> "*" ToolType : classifies
+    ToolType "1" --> "*" ToolItem : instantiates
+    ToolItem "1" --> "*" Reservation : reserved as
+    ToolItem "1" --> "*" Rental : rented as
+    ToolItem "1" --> "*" Maintenance : serviced by
+    Customer "1" --> "*" Reservation : makes
+    Customer "1" --> "*" Rental : makes
+    Reservation "0..1" --> "0..1" Rental : may become
+
+    ToolItem --> ToolStatus
+    Reservation --> ReservationStatus
+    Rental --> RentalStatus
+    Maintenance --> MaintenanceType
+    User --> Role
