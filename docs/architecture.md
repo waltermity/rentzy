@@ -22,34 +22,10 @@ flowchart LR
     BE -->|SQL| DB[(PostgreSQL)]
 ```
 ---
-## Backend Architecture
+## Authentication and authorization
 
-```
-┌──────────────────────────────────────────┐
-│  HTTP Layer (internal/http)              │
-│  - router.go                             │
-│  - handler/*.go                          │
-│  - respond/*.go                          │
-│  Responsibility: HTTP concerns only      │
-│  (JSON decode/encode, status codes)      │
-└──────────────────┬───────────────────────┘
-                   │
-┌──────────────────▼───────────────────────┐
-│  Service Layer (internal/service)        │
-│  - tool.go, customer.go,                 │
-│    reservation.go, rental.go, ...        │
-│  Responsibility: business logic + SQL    │
-│  (validation, transactions, calculations)│
-└──────────────────┬───────────────────────┘
-                   │
-┌──────────────────▼───────────────────────┐
-│  Domain Layer (internal/domain)          │
-│  - tool.go, customer.go, reservation.go, │
-│    rental.go, maintenance.go, errors.go  │
-│  Responsibility: entities, enums,        │
-│  sentinel errors. No dependencies.       │
-└──────────────────────────────────────────┘
-                   │
-                   ▼
-              PostgreSQL
-```
+- **Authentication** — JWT (HS256). Users log in with username + password;
+  passwords are hashed with bcrypt. A signed JWT is returned and must be
+  sent as `Authorization: Bearer <token>` on protected endpoints.
+- **Authorization** — role-based (RBAC). Three roles: `ADMIN`, `STAFF` and `CUSTOMER`.
+  The JWT contains the role, middleware enforces access per route group.
