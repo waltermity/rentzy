@@ -11,6 +11,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title           Rentzy API
+// @version         1.0
+// @description     Tool rental administration system API.
+// @host            localhost:8080
+// @BasePath        /
 func main() {
 	if err := godotenv.Load("../.env"); err != nil {
 		log.Fatal("loading .env file", err)

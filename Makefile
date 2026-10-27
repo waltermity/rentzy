@@ -10,6 +10,7 @@ help:
 	@echo   make docker-up   Start postgres in background
 	@echo   make docker-down Stop postgres
 	@echo   make health      Curl /healthz
+	@echo   make swagger     Regenerate Swagger docs from annotations
 
 run:
 	cd backend && go run ./cmd/rentzy
@@ -31,3 +32,6 @@ docker-down:
 
 health:
 	curl -i http://localhost:8080/healthz
+
+swagger:
+	cd backend && swag init -g cmd/rentzy/main.go -o docs
