@@ -1,0 +1,28 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  description: Tool rental administration system API.
+  title: Rentzy API
+  version: "1.0"
+paths:
+  /healthz:
+    get:
+      description: Returns 200 if the database is reachable, 503 otherwise.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health check
+      tags:
+      - system
+swagger: "2.0"
