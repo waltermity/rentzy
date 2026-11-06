@@ -14,11 +14,16 @@ import (
 func NewRouter(pool *pgxpool.Pool) *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	health := handler.NewHealthHandler(pool)
 
 	r.GET("/healthz", health.Healthz)
 
+	// Business endpoints will be registered here.
+	// api := r.Group("/api") 
+	// api.GET("/tools", toolHandler.List) 
+	// api.POST("/tools", toolHandler.Create) 
+	
 	return r
 }
