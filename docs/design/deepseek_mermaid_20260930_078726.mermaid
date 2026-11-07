@@ -62,7 +62,8 @@ classDiagram
         +int64 ID
         +int64 CustomerID
         +int64 ToolItemID
-        +*int64 ReservationID
+        +int64 ReservationID
+        +int64 StaffID
         +time.Time StartDate
         +time.Time ExpectedEndDate
         +*time.Time ActualEndDate
@@ -124,7 +125,8 @@ classDiagram
     ToolItem "1" --> "*" Maintenance : serviced by
     Customer "1" --> "*" Reservation : makes
     Customer "1" --> "*" Rental : makes
-    Reservation "0..1" --> "0..1" Rental : may become
+    Reservation "1" --> "0..1" Rental : may become
+    User "1" --> "*" Rental : hands out
 
     ToolItem --> ToolStatus
     Reservation --> ReservationStatus
