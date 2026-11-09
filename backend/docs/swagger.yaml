@@ -1,11 +1,2164 @@
 basePath: /
-host: localhost:8080
+definitions:
+  domain.BusyInterval:
+    properties:
+      end:
+        type: string
+      source:
+        description: |-
+          "reservation", "rental", or "rental_overdue": a late rental; its End is
+          only the end of the queried window, the item is busy until it is returned.
+        type: string
+      start:
+        type: string
+      tool_item_id:
+        type: integer
+    type: object
+  domain.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  domain.Condition:
+    enum:
+    - NEW
+    - GOOD
+    - FAIR
+    - POOR
+    - DAMAGED
+    type: string
+    x-enum-varnames:
+    - ConditionNew
+    - ConditionGood
+    - ConditionFair
+    - ConditionPoor
+    - ConditionDamaged
+  domain.Customer:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  domain.Fees:
+    properties:
+      base_fee:
+        type: number
+      late_days:
+        type: integer
+      late_fee:
+        type: number
+      total_fee:
+        type: number
+    type: object
+  domain.Maintenance:
+    properties:
+      completed_at:
+        type: string
+      cost:
+        type: number
+      description:
+        type: string
+      id:
+        type: integer
+      performed_by:
+        type: string
+      started_at:
+        type: string
+      tool_item_id:
+        type: integer
+      tool_type_name:
+        type: string
+      type:
+        $ref: '#/definitions/domain.MaintenanceType'
+    type: object
+  domain.MaintenanceDue:
+    properties:
+      days_since:
+        type: integer
+      due:
+        type: boolean
+      last_maintenance_at:
+        type: string
+      maintenance_every_days:
+        type: integer
+      maintenance_every_hours:
+        type: number
+      maintenance_every_rentals:
+        type: integer
+      operating_hours_since:
+        type: number
+      reasons:
+        items:
+          type: string
+        type: array
+      rentals_since:
+        type: integer
+      since:
+        description: last maintenance, or acquisition
+        type: string
+      status:
+        $ref: '#/definitions/domain.ToolStatus'
+      tool_item_id:
+        type: integer
+      tool_type_id:
+        type: integer
+      tool_type_name:
+        type: string
+    type: object
+  domain.MaintenanceType:
+    enum:
+    - SCHEDULED
+    - REPAIR
+    - INSPECTION
+    type: string
+    x-enum-varnames:
+    - MaintenanceScheduled
+    - MaintenanceRepair
+    - MaintenanceInspection
+  domain.Rental:
+    properties:
+      actual_end_date:
+        type: string
+      base_fee:
+        type: number
+      condition_at_handover:
+        $ref: '#/definitions/domain.Condition'
+      condition_at_return:
+        $ref: '#/definitions/domain.Condition'
+      customer_id:
+        type: integer
+      customer_name:
+        type: string
+      deposit_paid:
+        type: number
+      expected_end_date:
+        type: string
+      id:
+        type: integer
+      late_fee:
+        type: number
+      operating_hours:
+        type: number
+      reservation_id:
+        type: integer
+      staff_id:
+        type: integer
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/domain.RentalStatus'
+      tool_item_id:
+        type: integer
+      tool_type_id:
+        type: integer
+      tool_type_name:
+        type: string
+      total_fee:
+        type: number
+    type: object
+  domain.RentalStatus:
+    enum:
+    - ACTIVE
+    - RETURNED
+    - OVERDUE
+    - CANCELLED
+    type: string
+    x-enum-varnames:
+    - RentalActive
+    - RentalReturned
+    - RentalOverdue
+    - RentalCancelled
+  domain.Reservation:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: integer
+      customer_name:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/domain.ReservationStatus'
+      tool_item_id:
+        type: integer
+      tool_type_id:
+        type: integer
+      tool_type_name:
+        type: string
+    type: object
+  domain.ReservationStatus:
+    enum:
+    - PENDING
+    - CONFIRMED
+    - CANCELLED
+    - CONVERTED
+    - EXPIRED
+    type: string
+    x-enum-comments:
+      ReservationConverted: became a rental
+    x-enum-descriptions:
+    - ""
+    - ""
+    - ""
+    - became a rental
+    - ""
+    x-enum-varnames:
+    - ReservationPending
+    - ReservationConfirmed
+    - ReservationCancelled
+    - ReservationConverted
+    - ReservationExpired
+  domain.Role:
+    enum:
+    - ADMIN
+    - STAFF
+    - CUSTOMER
+    type: string
+    x-enum-varnames:
+    - RoleAdmin
+    - RoleStaff
+    - RoleCustomer
+  domain.ToolItem:
+    properties:
+      acquired_at:
+        type: string
+      current_condition:
+        $ref: '#/definitions/domain.Condition'
+      id:
+        type: integer
+      status:
+        $ref: '#/definitions/domain.ToolStatus'
+      tool_type_id:
+        type: integer
+      tool_type_name:
+        type: string
+    type: object
+  domain.ToolStatus:
+    enum:
+    - AVAILABLE
+    - RENTED
+    - MAINTENANCE
+    - BROKEN
+    - RETIRED
+    type: string
+    x-enum-varnames:
+    - ToolAvailable
+    - ToolRented
+    - ToolMaintenance
+    - ToolBroken
+    - ToolRetired
+  domain.ToolType:
+    properties:
+      category_id:
+        type: integer
+      category_name:
+        type: string
+      daily_rate:
+        type: number
+      deposit:
+        type: number
+      id:
+        type: integer
+      item_counts:
+        additionalProperties:
+          type: integer
+        description: Number of items per status; filled by list/get queries.
+        type: object
+      maintenance_every_days:
+        type: integer
+      maintenance_every_hours:
+        type: number
+      maintenance_every_rentals:
+        description: Maintenance thresholds; nil means the rule is not used.
+        type: integer
+      manufacturer:
+        type: string
+      model:
+        type: string
+      name:
+        type: string
+      purchase_price:
+        type: number
+    type: object
+  domain.User:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        description: set only for CUSTOMER users
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      role:
+        $ref: '#/definitions/domain.Role'
+      username:
+        type: string
+    type: object
+  handler.addItemsRequest:
+    properties:
+      acquired_at:
+        type: string
+      condition:
+        allOf:
+        - $ref: '#/definitions/domain.Condition'
+        enum:
+        - NEW
+        - GOOD
+        - FAIR
+        - POOR
+        example: NEW
+      count:
+        example: 1
+        type: integer
+    type: object
+  handler.cancelRentalRequest:
+    properties:
+      condition_at_return:
+        allOf:
+        - $ref: '#/definitions/domain.Condition'
+        enum:
+        - NEW
+        - GOOD
+        - FAIR
+        - POOR
+        - DAMAGED
+    type: object
+  handler.categoryRequest:
+    properties:
+      name:
+        example: Drilling & Demolition
+        type: string
+    required:
+    - name
+    type: object
+  handler.changePasswordRequest:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  handler.completeMaintenanceRequest:
+    properties:
+      completed_at:
+        description: defaults to now
+        type: string
+      condition:
+        allOf:
+        - $ref: '#/definitions/domain.Condition'
+        enum:
+        - NEW
+        - GOOD
+        - FAIR
+        - POOR
+        - DAMAGED
+      cost:
+        example: 6500
+        type: number
+      description:
+        type: string
+      performed_by:
+        type: string
+      result_status:
+        allOf:
+        - $ref: '#/definitions/domain.ToolStatus'
+        description: defaults to AVAILABLE
+        enum:
+        - AVAILABLE
+        - BROKEN
+        - RETIRED
+    type: object
+  handler.createReservationRequest:
+    properties:
+      customer_id:
+        description: staff/admin only (required for them)
+        type: integer
+      end_date:
+        example: "2026-11-22T08:00:00+01:00"
+        type: string
+      start_date:
+        example: "2026-11-20T08:00:00+01:00"
+        type: string
+      tool_item_id:
+        description: staff/admin only
+        type: integer
+      tool_type_id:
+        example: 1
+        type: integer
+    required:
+    - end_date
+    - start_date
+    type: object
+  handler.createUserRequest:
+    properties:
+      customer:
+        allOf:
+        - $ref: '#/definitions/handler.customerRequest'
+        description: '...or create a new one.'
+      customer_id:
+        description: 'CUSTOMER only: link an existing customer...'
+        type: integer
+      email:
+        type: string
+      password:
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/domain.Role'
+        enum:
+        - ADMIN
+        - STAFF
+        - CUSTOMER
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - role
+    - username
+    type: object
+  handler.customerRequest:
+    properties:
+      address:
+        example: 1052 Budapest, Petőfi Sándor utca 8.
+        type: string
+      email:
+        example: kovacs.anna@example.com
+        type: string
+      name:
+        example: Kovács Anna
+        type: string
+      phone:
+        example: "+3612345678"
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  handler.handoverRequest:
+    properties:
+      condition_at_handover:
+        allOf:
+        - $ref: '#/definitions/domain.Condition'
+        enum:
+        - NEW
+        - GOOD
+        - FAIR
+        - POOR
+      reservation_id:
+        example: 10
+        type: integer
+    required:
+    - reservation_id
+    type: object
+  handler.loginRequest:
+    properties:
+      password:
+        example: Rentzy123!
+        type: string
+      username:
+        example: kovacs.anna
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.meResponse:
+    properties:
+      customer:
+        $ref: '#/definitions/domain.Customer'
+      user:
+        $ref: '#/definitions/domain.User'
+    type: object
+  handler.registerRequest:
+    properties:
+      address:
+        example: 1111 Budapest, Fő utca 1.
+        type: string
+      email:
+        example: uj.ugyfel@example.com
+        type: string
+      name:
+        example: Új Ügyfél
+        type: string
+      password:
+        example: Secret123!
+        type: string
+      phone:
+        example: "+3612345678"
+        type: string
+      username:
+        example: uj.ugyfel
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - username
+    type: object
+  handler.returnRequest:
+    properties:
+      condition_at_return:
+        allOf:
+        - $ref: '#/definitions/domain.Condition'
+        enum:
+        - NEW
+        - GOOD
+        - FAIR
+        - POOR
+        - DAMAGED
+      operating_hours:
+        example: 6.5
+        type: number
+      returned_at:
+        description: defaults to now
+        type: string
+    required:
+    - condition_at_return
+    type: object
+  handler.startMaintenanceRequest:
+    properties:
+      description:
+        example: Chain sharpening
+        type: string
+      performed_by:
+        example: toth.gabor
+        type: string
+      started_at:
+        description: defaults to now
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/domain.MaintenanceType'
+        enum:
+        - SCHEDULED
+        - REPAIR
+        - INSPECTION
+    required:
+    - type
+    type: object
+  handler.toolTypeRequest:
+    properties:
+      category_id:
+        example: 1
+        type: integer
+      daily_rate:
+        example: 4500
+        type: number
+      deposit:
+        example: 20000
+        type: number
+      maintenance_every_days:
+        example: 180
+        type: integer
+      maintenance_every_hours:
+        example: 50
+        type: number
+      maintenance_every_rentals:
+        example: 20
+        type: integer
+      manufacturer:
+        example: Bosch
+        type: string
+      model:
+        example: GBH 2-28 F
+        type: string
+      name:
+        example: Rotary hammer (SDS-plus)
+        type: string
+      purchase_price:
+        example: 120000
+        type: number
+    required:
+    - category_id
+    - name
+    type: object
+  handler.updateItemRequest:
+    properties:
+      condition:
+        allOf:
+        - $ref: '#/definitions/domain.Condition'
+        enum:
+        - NEW
+        - GOOD
+        - FAIR
+        - POOR
+        - DAMAGED
+      status:
+        allOf:
+        - $ref: '#/definitions/domain.ToolStatus'
+        enum:
+        - AVAILABLE
+        - BROKEN
+        - RETIRED
+    type: object
+  handler.updateUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/domain.Role'
+        enum:
+        - ADMIN
+        - STAFF
+    type: object
+  respond.ErrorBody:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  respond.ErrorEnvelope:
+    properties:
+      error:
+        $ref: '#/definitions/respond.ErrorBody'
+    type: object
+  service.Availability:
+    properties:
+      available_item_ids:
+        description: free for the whole [from, to)
+        items:
+          type: integer
+        type: array
+      bookable_item_ids:
+        description: not in maintenance, broken or retired
+        items:
+          type: integer
+        type: array
+      busy:
+        items:
+          $ref: '#/definitions/domain.BusyInterval'
+        type: array
+      from:
+        type: string
+      to:
+        type: string
+      tool_type_id:
+        type: integer
+    type: object
+  service.ItemUtilization:
+    properties:
+      capacity_hours:
+        description: hours the item existed in the window
+        type: number
+      category_name:
+        type: string
+      rental_count:
+        type: integer
+      rented_hours:
+        type: number
+      revenue:
+        type: number
+      status:
+        $ref: '#/definitions/domain.ToolStatus'
+      tool_item_id:
+        type: integer
+      tool_type_id:
+        type: integer
+      tool_type_name:
+        type: string
+      utilization:
+        type: number
+    type: object
+  service.PopularReport:
+    properties:
+      types:
+        items:
+          $ref: '#/definitions/service.TypeStats'
+        type: array
+      window:
+        $ref: '#/definitions/service.Window'
+    type: object
+  service.ProcurementReport:
+    properties:
+      suggestions:
+        items:
+          $ref: '#/definitions/service.ProcurementSuggestion'
+        type: array
+      threshold:
+        type: number
+      window:
+        $ref: '#/definitions/service.Window'
+    type: object
+  service.ProcurementSuggestion:
+    properties:
+      category_name:
+        type: string
+      item_count:
+        description: items that are not retired
+        type: integer
+      payback_days:
+        description: Days to earn back one item's purchase price at the window's revenue
+          per item.
+        type: integer
+      purchase_price:
+        description: per item
+        type: number
+      reason:
+        type: string
+      rental_count:
+        description: rentals started in the window
+        type: integer
+      rented_hours:
+        description: over non-retired items
+        type: number
+      revenue:
+        description: fees of rentals returned in the window
+        type: number
+      suggested_additional:
+        type: integer
+      tool_type_id:
+        type: integer
+      tool_type_name:
+        type: string
+      utilization:
+        description: rented / capacity hours, 0..1
+        type: number
+    type: object
+  service.ReturnResult:
+    properties:
+      fees:
+        $ref: '#/definitions/domain.Fees'
+      rental:
+        $ref: '#/definitions/domain.Rental'
+    type: object
+  service.Session:
+    properties:
+      customer:
+        $ref: '#/definitions/domain.Customer'
+      expires_at:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/domain.User'
+    type: object
+  service.ToolItemDetail:
+    properties:
+      acquired_at:
+        type: string
+      current_condition:
+        $ref: '#/definitions/domain.Condition'
+      id:
+        type: integer
+      maintenance:
+        $ref: '#/definitions/domain.MaintenanceDue'
+      status:
+        $ref: '#/definitions/domain.ToolStatus'
+      tool_type_id:
+        type: integer
+      tool_type_name:
+        type: string
+    type: object
+  service.TypeStats:
+    properties:
+      category_name:
+        type: string
+      item_count:
+        description: items that are not retired
+        type: integer
+      purchase_price:
+        description: per item
+        type: number
+      rental_count:
+        description: rentals started in the window
+        type: integer
+      rented_hours:
+        description: over non-retired items
+        type: number
+      revenue:
+        description: fees of rentals returned in the window
+        type: number
+      tool_type_id:
+        type: integer
+      tool_type_name:
+        type: string
+      utilization:
+        description: rented / capacity hours, 0..1
+        type: number
+    type: object
+  service.UtilizationReport:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/service.ItemUtilization'
+        type: array
+      total_revenue:
+        type: number
+      types:
+        items:
+          $ref: '#/definitions/service.TypeStats'
+        type: array
+      window:
+        $ref: '#/definitions/service.Window'
+    type: object
+  service.Window:
+    properties:
+      from:
+        type: string
+      to:
+        type: string
+    type: object
 info:
   contact: {}
   description: Tool rental administration system API.
   title: Rentzy API
   version: "1.0"
 paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/service.Session'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      summary: Log in
+      tags:
+      - auth
+  /api/auth/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/handler.meResponse'
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Current user
+      tags:
+      - auth
+  /api/auth/password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Old and new password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.changePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                properties:
+                  status:
+                    type: string
+                type: object
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Change own password
+      tags:
+      - auth
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: New customer
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/service.Session'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: username or email taken
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      summary: Register as a customer
+      tags:
+      - auth
+  /api/categories:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.Category'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List categories
+      tags:
+      - tools
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.categoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Category'
+            type: object
+        "409":
+          description: name taken
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Create category
+      tags:
+      - tools
+  /api/categories/{id}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.categoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Category'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Update category
+      tags:
+      - tools
+  /api/customers:
+    get:
+      parameters:
+      - description: Search in name, email, phone
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.Customer'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List customers
+      tags:
+      - customers
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Customer
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.customerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Customer'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: email taken
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Create customer
+      tags:
+      - customers
+  /api/customers/{id}:
+    get:
+      parameters:
+      - description: Customer id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Customer'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Get customer
+      tags:
+      - customers
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Customer id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Customer
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.customerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Customer'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Update customer
+      tags:
+      - customers
+  /api/maintenance:
+    get:
+      parameters:
+      - description: Filter by item
+        in: query
+        name: tool_item_id
+        type: integer
+      - description: 'true: in progress, false: completed'
+        in: query
+        name: open
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.Maintenance'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List maintenance records
+      tags:
+      - maintenance
+  /api/maintenance/{id}:
+    get:
+      parameters:
+      - description: Maintenance id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Maintenance'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Get maintenance record
+      tags:
+      - maintenance
+  /api/maintenance/{id}/complete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Maintenance id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Result
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.completeMaintenanceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Maintenance'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: already completed
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Complete maintenance
+      tags:
+      - maintenance
+  /api/maintenance/due:
+    get:
+      parameters:
+      - description: 'true: list every item with its usage, not just the due ones'
+        in: query
+        name: all
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.MaintenanceDue'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Maintenance due
+      tags:
+      - maintenance
+  /api/rentals:
+    get:
+      parameters:
+      - description: Filter (staff/admin)
+        in: query
+        name: customer_id
+        type: integer
+      - description: Filter
+        in: query
+        name: tool_item_id
+        type: integer
+      - description: Filter
+        in: query
+        name: staff_id
+        type: integer
+      - description: 'Comma-separated: ACTIVE,OVERDUE,RETURNED,CANCELLED'
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.Rental'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List rentals
+      tags:
+      - rentals
+    post:
+      consumes:
+      - application/json
+      description: Starts now, expected end = reservation end, deposit = tool type
+        deposit. Refused (409) if the item is in maintenance, broken, retired or still
+        rented.
+      parameters:
+      - description: Reservation to convert
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.handoverRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Rental'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Hand over (start rental)
+      tags:
+      - rentals
+  /api/rentals/{id}:
+    get:
+      parameters:
+      - description: Rental id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Rental'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Get rental
+      tags:
+      - rentals
+  /api/rentals/{id}/cancel:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Rental id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Condition defaults to the handover condition
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/handler.cancelRentalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Rental'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Cancel rental
+      tags:
+      - rentals
+  /api/rentals/{id}/return:
+    post:
+      consumes:
+      - application/json
+      description: Base fee = daily rate x started planned days; late fee = daily
+        rate x started days late. The item becomes AVAILABLE, or BROKEN if returned
+        DAMAGED.
+      parameters:
+      - description: Rental id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Return data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.returnRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/service.ReturnResult'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Return (close rental)
+      tags:
+      - rentals
+  /api/reports/popular:
+    get:
+      parameters:
+      - description: 'Default: 90 days before to'
+        in: query
+        name: from
+        type: string
+      - description: 'Default: now'
+        in: query
+        name: to
+        type: string
+      - description: 'Default: 10'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/service.PopularReport'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Most rented tools
+      tags:
+      - reports
+  /api/reports/procurement:
+    get:
+      description: Suggests more items for every type whose non-retired items' utilization
+        is at or above the threshold, with the number needed to get below it.
+      parameters:
+      - description: 'Default: 90 days before to'
+        in: query
+        name: from
+        type: string
+      - description: 'Default: now'
+        in: query
+        name: to
+        type: string
+      - description: Utilization threshold in (0, 1], default 0.7
+        in: query
+        name: threshold
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/service.ProcurementReport'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Procurement suggestions
+      tags:
+      - reports
+  /api/reports/utilization:
+    get:
+      parameters:
+      - description: 'Default: 90 days before to'
+        in: query
+        name: from
+        type: string
+      - description: 'Default: now'
+        in: query
+        name: to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/service.UtilizationReport'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Utilization and revenue
+      tags:
+      - reports
+  /api/reservations:
+    get:
+      parameters:
+      - description: Filter (staff/admin)
+        in: query
+        name: customer_id
+        type: integer
+      - description: Filter
+        in: query
+        name: tool_item_id
+        type: integer
+      - description: 'Comma-separated: PENDING,CONFIRMED,CANCELLED,CONVERTED,EXPIRED'
+        in: query
+        name: status
+        type: string
+      - description: Overlapping period start
+        in: query
+        name: from
+        type: string
+      - description: Overlapping period end
+        in: query
+        name: to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.Reservation'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List reservations
+      tags:
+      - reservations
+    post:
+      consumes:
+      - application/json
+      description: Customers send tool_type_id and get any free item of that type.
+        Staff/admin must send customer_id and may send tool_item_id for an exact item.
+        Overlapping bookings are refused with 409.
+      parameters:
+      - description: Reservation
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Reservation'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: no free item
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Create reservation
+      tags:
+      - reservations
+  /api/reservations/{id}:
+    get:
+      parameters:
+      - description: Reservation id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Reservation'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Get reservation
+      tags:
+      - reservations
+  /api/reservations/{id}/cancel:
+    post:
+      parameters:
+      - description: Reservation id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Reservation'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: not open any more
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Cancel reservation
+      tags:
+      - reservations
+  /api/tool-items:
+    get:
+      parameters:
+      - description: Filter by tool type
+        in: query
+        name: tool_type_id
+        type: integer
+      - description: AVAILABLE, RENTED, MAINTENANCE, BROKEN or RETIRED
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.ToolItem'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List tool items
+      tags:
+      - tools
+  /api/tool-items/{id}:
+    get:
+      parameters:
+      - description: Tool item id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/service.ToolItemDetail'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Get tool item
+      tags:
+      - tools
+    patch:
+      consumes:
+      - application/json
+      description: RENTED is set by handover, MAINTENANCE by starting maintenance.
+        Rented items cannot be changed; items in maintenance can only be retired.
+      parameters:
+      - description: Tool item id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fields to change
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.ToolItem'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Update tool item
+      tags:
+      - tools
+  /api/tool-items/{id}/maintenance:
+    get:
+      parameters:
+      - description: Tool item id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.Maintenance'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Tool item maintenance history
+      tags:
+      - maintenance
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tool item id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Maintenance
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.startMaintenanceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.Maintenance'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: item rented or retired
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Start maintenance
+      tags:
+      - maintenance
+  /api/tool-types:
+    get:
+      parameters:
+      - description: Filter by category
+        in: query
+        name: category_id
+        type: integer
+      - description: Search in name, manufacturer, model
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.ToolType'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List tool types
+      tags:
+      - tools
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tool type
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.toolTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.ToolType'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Create tool type
+      tags:
+      - tools
+  /api/tool-types/{id}:
+    get:
+      parameters:
+      - description: Tool type id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.ToolType'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Get tool type
+      tags:
+      - tools
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tool type id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Tool type
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.toolTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.ToolType'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Update tool type
+      tags:
+      - tools
+  /api/tool-types/{id}/availability:
+    get:
+      description: Busy intervals (open reservations and rentals) of the type's items
+        in [from, to), the items that can be booked at all, and those free for the
+        whole period.
+      parameters:
+      - description: Tool type id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: RFC 3339 or YYYY-MM-DD
+        in: query
+        name: from
+        required: true
+        type: string
+      - description: RFC 3339 or YYYY-MM-DD
+        in: query
+        name: to
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/service.Availability'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Tool type availability
+      tags:
+      - tools
+  /api/tool-types/{id}/items:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tool type id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: count defaults to 1, condition to NEW, acquired_at to now
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.addItemsRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.ToolItem'
+                type: array
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Add tool items
+      tags:
+      - tools
+  /api/users:
+    get:
+      parameters:
+      - description: ADMIN, STAFF or CUSTOMER
+        in: query
+        name: role
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/domain.User'
+                type: array
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: New user
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.User'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Create user
+      tags:
+      - users
+  /api/users/{id}:
+    get:
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.User'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Get user
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fields to change
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/domain.User'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/respond.ErrorEnvelope'
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - users
   /healthz:
     get:
       description: Returns 200 if the database is reachable, 503 otherwise.
@@ -25,4 +2178,10 @@ paths:
       summary: Health check
       tags:
       - system
+securityDefinitions:
+  BearerAuth:
+    description: '"Bearer <token>" from POST /api/auth/login'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
