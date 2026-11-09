@@ -24,7 +24,6 @@ import (
 // @title                       Rentzy API
 // @version                     1.0
 // @description                 Tool rental administration system API.
-// @host                        localhost:8080
 // @BasePath                    /
 // @securityDefinitions.apikey  BearerAuth
 // @in                          header

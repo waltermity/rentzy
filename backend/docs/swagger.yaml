@@ -5,7 +5,9 @@ definitions:
       end:
         type: string
       source:
-        description: '"reservation" or "rental"'
+        description: |-
+          "reservation", "rental", or "rental_overdue": a late rental; its End is
+          only the end of the queried window, the item is busy until it is returned.
         type: string
       start:
         type: string
@@ -822,7 +824,6 @@ definitions:
       to:
         type: string
     type: object
-host: localhost:8080
 info:
   contact: {}
   description: Tool rental administration system API.

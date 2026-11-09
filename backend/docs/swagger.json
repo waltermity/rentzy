@@ -6,7 +6,6 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
     "basePath": "/",
     "paths": {
         "/api/auth/login": {
@@ -2169,7 +2168,7 @@
                     "type": "string"
                 },
                 "source": {
-                    "description": "\"reservation\" or \"rental\"",
+                    "description": "\"reservation\", \"rental\", or \"rental_overdue\": a late rental; its End is\nonly the end of the queried window, the item is busy until it is returned.",
                     "type": "string"
                 },
                 "start": {
