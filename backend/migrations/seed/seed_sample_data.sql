@@ -1,6 +1,6 @@
 -- Sample data for local development and demos. DEV ONLY.
 --
--- Load it with `make seed` after the migrations. It is not a migration:
+-- Load it with `make seed` after the migrations (000001 and 000002). It is not a migration:
 -- golang-migrate ignores the seed/ folder, so `migrate up` never runs it.
 -- Safe to run more than once: every INSERT uses ON CONFLICT DO NOTHING, so rows
 -- that already exist are skipped. Ids are fixed, so use a fresh dev database.
@@ -190,6 +190,18 @@ INSERT INTO maintenance (id, tool_item_id, type, description, started_at, comple
     (7, 15, 'SCHEDULED',  'Chain sharpening, guide bar dressing, air filter and sprocket check.',                '2026-11-04 09:00:00+01', NULL,                     0.00,     'fekete.laszlo'),
     (8, 5,  'INSPECTION', 'Annual electrical safety test (insulation and earth continuity).',                    '2026-11-06 08:00:00+01', NULL,                     0.00,     'papp.judit')
 ON CONFLICT DO NOTHING;
+
+-- Needs migration 000002. Link every CUSTOMER login to its customer record by email.
+UPDATE users u
+SET customer_id = c.id
+FROM customers c
+WHERE u.role = 'CUSTOMER' AND u.email = c.email AND u.customer_id IS NULL;
+
+-- Maintenance thresholds (needs migration 000002). NULL = that rule is not used.
+UPDATE tool_types SET maintenance_every_rentals = 20, maintenance_every_days = 180 WHERE id IN (1, 2, 3);
+UPDATE tool_types SET maintenance_every_rentals = 15, maintenance_every_days = 180 WHERE id IN (4, 5, 6, 7, 8);
+UPDATE tool_types SET maintenance_every_rentals = 10, maintenance_every_days = 90, maintenance_every_hours = 50 WHERE id IN (9, 10);
+UPDATE tool_types SET maintenance_every_rentals = 25, maintenance_every_days = 365 WHERE id IN (11, 12);
 
 -- Move each id sequence past the ids used above, so new rows get fresh ids.
 SELECT setval(pg_get_serial_sequence('users', 'id'),        (SELECT MAX(id) FROM users));
