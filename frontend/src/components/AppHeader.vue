@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
@@ -31,6 +31,40 @@ const links = computed(() => {
   return l
 })
 
+// How the links are shown, depending on the space next to the account area:
+// 'full' (icon + label), 'icons' (icons with tooltips) or 'menu' (one menu button).
+// Measured, not a fixed breakpoint, because the space depends on the role (number
+// of links), the user's name and the label lengths.
+type NavMode = 'full' | 'icons' | 'menu'
+const inner = ref<HTMLElement>()
+const nav = ref<HTMLElement>()
+const mode = ref<NavMode>('full')
+
+const overflows = () => !!nav.value && nav.value.scrollWidth > nav.value.clientWidth + 1
+
+async function fit() {
+  for (const m of ['full', 'icons'] as NavMode[]) {
+    mode.value = m
+    await nextTick()
+    if (!overflows()) return
+  }
+  mode.value = 'menu'
+}
+
+const navMenu = ref<InstanceType<typeof Menu>>()
+const navMenuItems = computed(() =>
+  links.value.map((l) => ({ label: l.text, icon: l.icon, command: () => router.push(l.to) })),
+)
+
+let observer: ResizeObserver | undefined
+onMounted(() => {
+  observer = new ResizeObserver(() => fit())
+  if (inner.value) observer.observe(inner.value)
+  fit()
+})
+onBeforeUnmount(() => observer?.disconnect())
+watch(() => [links.value.length, auth.displayName, auth.role], () => fit())
+
 const menu = ref<InstanceType<typeof Menu>>()
 const menuItems = [
   { label: 'Profil', icon: 'pi pi-user', command: () => router.push('/profile') },
@@ -48,18 +82,23 @@ const menuItems = [
 
 <template>
   <header class="header">
-    <div class="inner">
+    <div ref="inner" class="inner">
       <RouterLink to="/catalog" class="brand" aria-label="Rentzy kezdőlap">
         <img src="/favicon.svg" alt="" width="28" height="28" />
         <span>Rentzy</span>
       </RouterLink>
 
-      <nav class="nav" :class="{ many: links.length > 5 }" aria-label="Főmenü">
+      <nav v-if="mode !== 'menu'" ref="nav" class="nav" :class="{ compact: mode === 'icons' }" aria-label="Főmenü">
         <RouterLink v-for="l in links" :key="l.to" :to="l.to" class="nav-link" :title="l.text" :aria-label="l.text">
           <i :class="l.icon" aria-hidden="true" />
           <span>{{ l.text }}</span>
         </RouterLink>
       </nav>
+      <div v-else class="nav">
+        <Button icon="pi pi-bars" text aria-label="Menü" aria-haspopup="true" aria-controls="nav-menu"
+          @click="navMenu?.toggle($event)" />
+        <Menu id="nav-menu" ref="navMenu" :model="navMenuItems" popup />
+      </div>
 
       <div class="account">
         <template v-if="auth.isLoggedIn">
@@ -88,8 +127,7 @@ const menuItems = [
   border-bottom: 1px solid var(--app-border);
 }
 .inner {
-  max-width: var(--app-max);
-  margin: 0 auto;
+  /* Full width (not capped like the page content) so the menu labels fit on wide screens. */
   padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
@@ -174,11 +212,9 @@ const menuItems = [
 .role {
   font-size: 0.7rem;
 }
-/* Admins have 7 links: show icons only (with tooltips) when they would not fit. */
-@media (max-width: 1180px) {
-  .nav.many .nav-link span {
-    display: none;
-  }
+/* Set by fit() when the labels would not fit (mode 'icons'). */
+.nav.compact .nav-link span {
+  display: none;
 }
 @media (max-width: 720px) {
   .nav-link span,

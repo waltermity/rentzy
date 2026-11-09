@@ -39,7 +39,7 @@ The application is built with **Vue 3** and **TypeScript**, and relies on **Pini
 
 ## Layout
 
-The header is on every page: the logo and the links the user's role may open on the left, and on the right the user's name with their role (a menu with **Profile** and **Log out**), or a **Login** button for visitors. With many links (admins) on a narrow screen, the links show only their icons, with tooltips.
+The header is on every page: the logo and the links the user's role may open on the left, and on the right the user's name with their role (a menu with **Profile** and **Log out**), or a **Login** button for visitors. The header spans the full window width and measures itself: the links show icon and label when they fit, only icons (with tooltips) when they don't, and collapse into a single menu button (☰) when even the icons don't fit (for example the admin's 7 links on a phone).
 
 After logging in, users land on a page by role: customers on `/catalog`, staff on `/staff/rentals`, admins on `/admin/reports`. If they were sent to `/login` from a protected page, they go back to that page instead.
 
