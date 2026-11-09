@@ -6,9 +6,2111 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
     "basePath": "/",
     "paths": {
+        "/api/auth/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Log in",
+                "parameters": [
+                    {
+                        "description": "Credentials",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.loginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/service.Session"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Current user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/handler.meResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/password": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Change own password",
+                "parameters": [
+                    {
+                        "description": "Old and new password",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.changePasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/register": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register as a customer",
+                "parameters": [
+                    {
+                        "description": "New customer",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.registerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/service.Session"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "username or email taken",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/categories": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "List categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.Category"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Create category",
+                "parameters": [
+                    {
+                        "description": "Category",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.categoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Category"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "name taken",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/categories/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Update category",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Category",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.categoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Category"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/customers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "List customers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search in name, email, phone",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.Customer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Create customer",
+                "parameters": [
+                    {
+                        "description": "Customer",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.customerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Customer"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "email taken",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/customers/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Get customer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Customer id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Customer"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Update customer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Customer id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Customer",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.customerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Customer"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/maintenance": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maintenance"
+                ],
+                "summary": "List maintenance records",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Filter by item",
+                        "name": "tool_item_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "true: in progress, false: completed",
+                        "name": "open",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.Maintenance"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/maintenance/due": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maintenance"
+                ],
+                "summary": "Maintenance due",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "true: list every item with its usage, not just the due ones",
+                        "name": "all",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.MaintenanceDue"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/maintenance/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maintenance"
+                ],
+                "summary": "Get maintenance record",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Maintenance id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Maintenance"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/maintenance/{id}/complete": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maintenance"
+                ],
+                "summary": "Complete maintenance",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Maintenance id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Result",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.completeMaintenanceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Maintenance"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "already completed",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/rentals": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rentals"
+                ],
+                "summary": "List rentals",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Filter (staff/admin)",
+                        "name": "customer_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter",
+                        "name": "tool_item_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter",
+                        "name": "staff_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated: ACTIVE,OVERDUE,RETURNED,CANCELLED",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.Rental"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Starts now, expected end = reservation end, deposit = tool type deposit. Refused (409) if the item is in maintenance, broken, retired or still rented.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rentals"
+                ],
+                "summary": "Hand over (start rental)",
+                "parameters": [
+                    {
+                        "description": "Reservation to convert",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.handoverRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Rental"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/rentals/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rentals"
+                ],
+                "summary": "Get rental",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Rental id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Rental"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/rentals/{id}/cancel": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rentals"
+                ],
+                "summary": "Cancel rental",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Rental id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Condition defaults to the handover condition",
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/handler.cancelRentalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Rental"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/rentals/{id}/return": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Base fee = daily rate x started planned days; late fee = daily rate x started days late. The item becomes AVAILABLE, or BROKEN if returned DAMAGED.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rentals"
+                ],
+                "summary": "Return (close rental)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Rental id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Return data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.returnRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/service.ReturnResult"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reports/popular": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reports"
+                ],
+                "summary": "Most rented tools",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Default: 90 days before to",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Default: now",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Default: 10",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/service.PopularReport"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reports/procurement": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Suggests more items for every type whose non-retired items' utilization is at or above the threshold, with the number needed to get below it.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reports"
+                ],
+                "summary": "Procurement suggestions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Default: 90 days before to",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Default: now",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Utilization threshold in (0, 1], default 0.7",
+                        "name": "threshold",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/service.ProcurementReport"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reports/utilization": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reports"
+                ],
+                "summary": "Utilization and revenue",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Default: 90 days before to",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Default: now",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/service.UtilizationReport"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reservations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reservations"
+                ],
+                "summary": "List reservations",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Filter (staff/admin)",
+                        "name": "customer_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter",
+                        "name": "tool_item_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated: PENDING,CONFIRMED,CANCELLED,CONVERTED,EXPIRED",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Overlapping period start",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Overlapping period end",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.Reservation"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Customers send tool_type_id and get any free item of that type. Staff/admin must send customer_id and may send tool_item_id for an exact item. Overlapping bookings are refused with 409.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reservations"
+                ],
+                "summary": "Create reservation",
+                "parameters": [
+                    {
+                        "description": "Reservation",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createReservationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Reservation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "no free item",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reservations/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reservations"
+                ],
+                "summary": "Get reservation",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Reservation id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Reservation"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reservations/{id}/cancel": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reservations"
+                ],
+                "summary": "Cancel reservation",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Reservation id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Reservation"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "not open any more",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tool-items": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "List tool items",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Filter by tool type",
+                        "name": "tool_type_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "AVAILABLE, RENTED, MAINTENANCE, BROKEN or RETIRED",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.ToolItem"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tool-items/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Get tool item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tool item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/service.ToolItemDetail"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "RENTED is set by handover, MAINTENANCE by starting maintenance. Rented items cannot be changed; items in maintenance can only be retired.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Update tool item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tool item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to change",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.ToolItem"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tool-items/{id}/maintenance": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maintenance"
+                ],
+                "summary": "Tool item maintenance history",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tool item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.Maintenance"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maintenance"
+                ],
+                "summary": "Start maintenance",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tool item id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Maintenance",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.startMaintenanceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.Maintenance"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "item rented or retired",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tool-types": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "List tool types",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Filter by category",
+                        "name": "category_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search in name, manufacturer, model",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.ToolType"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Create tool type",
+                "parameters": [
+                    {
+                        "description": "Tool type",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.toolTypeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.ToolType"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tool-types/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Get tool type",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tool type id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.ToolType"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Update tool type",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tool type id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Tool type",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.toolTypeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.ToolType"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tool-types/{id}/availability": {
+            "get": {
+                "description": "Busy intervals (open reservations and rentals) of the type's items in [from, to), the items that can be booked at all, and those free for the whole period.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Tool type availability",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tool type id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "RFC 3339 or YYYY-MM-DD",
+                        "name": "from",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "RFC 3339 or YYYY-MM-DD",
+                        "name": "to",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/service.Availability"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tool-types/{id}/items": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tools"
+                ],
+                "summary": "Add tool items",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tool type id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "count defaults to 1, condition to NEW, acquired_at to now",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.addItemsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.ToolItem"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "List users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ADMIN, STAFF or CUSTOMER",
+                        "name": "role",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/domain.User"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create user",
+                "parameters": [
+                    {
+                        "description": "New user",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.User"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to change",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/domain.User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/respond.ErrorEnvelope"
+                        }
+                    }
+                }
+            }
+        },
         "/healthz": {
             "get": {
                 "description": "Returns 200 if the database is reachable, 503 otherwise.",
@@ -36,6 +2138,1225 @@
                     }
                 }
             }
+        }
+    },
+    "definitions": {
+        "domain.BusyInterval": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "string"
+                },
+                "source": {
+                    "description": "\"reservation\", \"rental\", or \"rental_overdue\": a late rental; its End is\nonly the end of the queried window, the item is busy until it is returned.",
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                },
+                "tool_item_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.Category": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Condition": {
+            "type": "string",
+            "enum": [
+                "NEW",
+                "GOOD",
+                "FAIR",
+                "POOR",
+                "DAMAGED"
+            ],
+            "x-enum-varnames": [
+                "ConditionNew",
+                "ConditionGood",
+                "ConditionFair",
+                "ConditionPoor",
+                "ConditionDamaged"
+            ]
+        },
+        "domain.Customer": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Fees": {
+            "type": "object",
+            "properties": {
+                "base_fee": {
+                    "type": "number"
+                },
+                "late_days": {
+                    "type": "integer"
+                },
+                "late_fee": {
+                    "type": "number"
+                },
+                "total_fee": {
+                    "type": "number"
+                }
+            }
+        },
+        "domain.Maintenance": {
+            "type": "object",
+            "properties": {
+                "completed_at": {
+                    "type": "string"
+                },
+                "cost": {
+                    "type": "number"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "performed_by": {
+                    "type": "string"
+                },
+                "started_at": {
+                    "type": "string"
+                },
+                "tool_item_id": {
+                    "type": "integer"
+                },
+                "tool_type_name": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/domain.MaintenanceType"
+                }
+            }
+        },
+        "domain.MaintenanceDue": {
+            "type": "object",
+            "properties": {
+                "days_since": {
+                    "type": "integer"
+                },
+                "due": {
+                    "type": "boolean"
+                },
+                "last_maintenance_at": {
+                    "type": "string"
+                },
+                "maintenance_every_days": {
+                    "type": "integer"
+                },
+                "maintenance_every_hours": {
+                    "type": "number"
+                },
+                "maintenance_every_rentals": {
+                    "type": "integer"
+                },
+                "operating_hours_since": {
+                    "type": "number"
+                },
+                "reasons": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "rentals_since": {
+                    "type": "integer"
+                },
+                "since": {
+                    "description": "last maintenance, or acquisition",
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/domain.ToolStatus"
+                },
+                "tool_item_id": {
+                    "type": "integer"
+                },
+                "tool_type_id": {
+                    "type": "integer"
+                },
+                "tool_type_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.MaintenanceType": {
+            "type": "string",
+            "enum": [
+                "SCHEDULED",
+                "REPAIR",
+                "INSPECTION"
+            ],
+            "x-enum-varnames": [
+                "MaintenanceScheduled",
+                "MaintenanceRepair",
+                "MaintenanceInspection"
+            ]
+        },
+        "domain.Rental": {
+            "type": "object",
+            "properties": {
+                "actual_end_date": {
+                    "type": "string"
+                },
+                "base_fee": {
+                    "type": "number"
+                },
+                "condition_at_handover": {
+                    "$ref": "#/definitions/domain.Condition"
+                },
+                "condition_at_return": {
+                    "$ref": "#/definitions/domain.Condition"
+                },
+                "customer_id": {
+                    "type": "integer"
+                },
+                "customer_name": {
+                    "type": "string"
+                },
+                "deposit_paid": {
+                    "type": "number"
+                },
+                "expected_end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "late_fee": {
+                    "type": "number"
+                },
+                "operating_hours": {
+                    "type": "number"
+                },
+                "reservation_id": {
+                    "type": "integer"
+                },
+                "staff_id": {
+                    "type": "integer"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/domain.RentalStatus"
+                },
+                "tool_item_id": {
+                    "type": "integer"
+                },
+                "tool_type_id": {
+                    "type": "integer"
+                },
+                "tool_type_name": {
+                    "type": "string"
+                },
+                "total_fee": {
+                    "type": "number"
+                }
+            }
+        },
+        "domain.RentalStatus": {
+            "type": "string",
+            "enum": [
+                "ACTIVE",
+                "RETURNED",
+                "OVERDUE",
+                "CANCELLED"
+            ],
+            "x-enum-varnames": [
+                "RentalActive",
+                "RentalReturned",
+                "RentalOverdue",
+                "RentalCancelled"
+            ]
+        },
+        "domain.Reservation": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "customer_id": {
+                    "type": "integer"
+                },
+                "customer_name": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/domain.ReservationStatus"
+                },
+                "tool_item_id": {
+                    "type": "integer"
+                },
+                "tool_type_id": {
+                    "type": "integer"
+                },
+                "tool_type_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ReservationStatus": {
+            "type": "string",
+            "enum": [
+                "PENDING",
+                "CONFIRMED",
+                "CANCELLED",
+                "CONVERTED",
+                "EXPIRED"
+            ],
+            "x-enum-comments": {
+                "ReservationConverted": "became a rental"
+            },
+            "x-enum-descriptions": [
+                "",
+                "",
+                "",
+                "became a rental",
+                ""
+            ],
+            "x-enum-varnames": [
+                "ReservationPending",
+                "ReservationConfirmed",
+                "ReservationCancelled",
+                "ReservationConverted",
+                "ReservationExpired"
+            ]
+        },
+        "domain.Role": {
+            "type": "string",
+            "enum": [
+                "ADMIN",
+                "STAFF",
+                "CUSTOMER"
+            ],
+            "x-enum-varnames": [
+                "RoleAdmin",
+                "RoleStaff",
+                "RoleCustomer"
+            ]
+        },
+        "domain.ToolItem": {
+            "type": "object",
+            "properties": {
+                "acquired_at": {
+                    "type": "string"
+                },
+                "current_condition": {
+                    "$ref": "#/definitions/domain.Condition"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/domain.ToolStatus"
+                },
+                "tool_type_id": {
+                    "type": "integer"
+                },
+                "tool_type_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ToolStatus": {
+            "type": "string",
+            "enum": [
+                "AVAILABLE",
+                "RENTED",
+                "MAINTENANCE",
+                "BROKEN",
+                "RETIRED"
+            ],
+            "x-enum-varnames": [
+                "ToolAvailable",
+                "ToolRented",
+                "ToolMaintenance",
+                "ToolBroken",
+                "ToolRetired"
+            ]
+        },
+        "domain.ToolType": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "daily_rate": {
+                    "type": "number"
+                },
+                "deposit": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "item_counts": {
+                    "description": "Number of items per status; filled by list/get queries.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "maintenance_every_days": {
+                    "type": "integer"
+                },
+                "maintenance_every_hours": {
+                    "type": "number"
+                },
+                "maintenance_every_rentals": {
+                    "description": "Maintenance thresholds; nil means the rule is not used.",
+                    "type": "integer"
+                },
+                "manufacturer": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "purchase_price": {
+                    "type": "number"
+                }
+            }
+        },
+        "domain.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "customer_id": {
+                    "description": "set only for CUSTOMER users",
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "role": {
+                    "$ref": "#/definitions/domain.Role"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.addItemsRequest": {
+            "type": "object",
+            "properties": {
+                "acquired_at": {
+                    "type": "string"
+                },
+                "condition": {
+                    "enum": [
+                        "NEW",
+                        "GOOD",
+                        "FAIR",
+                        "POOR"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.Condition"
+                        }
+                    ],
+                    "example": "NEW"
+                },
+                "count": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "handler.cancelRentalRequest": {
+            "type": "object",
+            "properties": {
+                "condition_at_return": {
+                    "enum": [
+                        "NEW",
+                        "GOOD",
+                        "FAIR",
+                        "POOR",
+                        "DAMAGED"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.Condition"
+                        }
+                    ]
+                }
+            }
+        },
+        "handler.categoryRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Drilling \u0026 Demolition"
+                }
+            }
+        },
+        "handler.changePasswordRequest": {
+            "type": "object",
+            "required": [
+                "new_password",
+                "old_password"
+            ],
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                },
+                "old_password": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.completeMaintenanceRequest": {
+            "type": "object",
+            "properties": {
+                "completed_at": {
+                    "description": "defaults to now",
+                    "type": "string"
+                },
+                "condition": {
+                    "enum": [
+                        "NEW",
+                        "GOOD",
+                        "FAIR",
+                        "POOR",
+                        "DAMAGED"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.Condition"
+                        }
+                    ]
+                },
+                "cost": {
+                    "type": "number",
+                    "example": 6500
+                },
+                "description": {
+                    "type": "string"
+                },
+                "performed_by": {
+                    "type": "string"
+                },
+                "result_status": {
+                    "description": "defaults to AVAILABLE",
+                    "enum": [
+                        "AVAILABLE",
+                        "BROKEN",
+                        "RETIRED"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.ToolStatus"
+                        }
+                    ]
+                }
+            }
+        },
+        "handler.createReservationRequest": {
+            "type": "object",
+            "required": [
+                "end_date",
+                "start_date"
+            ],
+            "properties": {
+                "customer_id": {
+                    "description": "staff/admin only (required for them)",
+                    "type": "integer"
+                },
+                "end_date": {
+                    "type": "string",
+                    "example": "2026-11-22T08:00:00+01:00"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2026-11-20T08:00:00+01:00"
+                },
+                "tool_item_id": {
+                    "description": "staff/admin only",
+                    "type": "integer"
+                },
+                "tool_type_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "handler.createUserRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "role",
+                "username"
+            ],
+            "properties": {
+                "customer": {
+                    "description": "...or create a new one.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/handler.customerRequest"
+                        }
+                    ]
+                },
+                "customer_id": {
+                    "description": "CUSTOMER only: link an existing customer...",
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "enum": [
+                        "ADMIN",
+                        "STAFF",
+                        "CUSTOMER"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.Role"
+                        }
+                    ]
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.customerRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "1052 Budapest, Petőfi Sándor utca 8."
+                },
+                "email": {
+                    "type": "string",
+                    "example": "kovacs.anna@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Kovács Anna"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+3612345678"
+                }
+            }
+        },
+        "handler.handoverRequest": {
+            "type": "object",
+            "required": [
+                "reservation_id"
+            ],
+            "properties": {
+                "condition_at_handover": {
+                    "enum": [
+                        "NEW",
+                        "GOOD",
+                        "FAIR",
+                        "POOR"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.Condition"
+                        }
+                    ]
+                },
+                "reservation_id": {
+                    "type": "integer",
+                    "example": 10
+                }
+            }
+        },
+        "handler.loginRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "Rentzy123!"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "kovacs.anna"
+                }
+            }
+        },
+        "handler.meResponse": {
+            "type": "object",
+            "properties": {
+                "customer": {
+                    "$ref": "#/definitions/domain.Customer"
+                },
+                "user": {
+                    "$ref": "#/definitions/domain.User"
+                }
+            }
+        },
+        "handler.registerRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "1111 Budapest, Fő utca 1."
+                },
+                "email": {
+                    "type": "string",
+                    "example": "uj.ugyfel@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Új Ügyfél"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "Secret123!"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+3612345678"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "uj.ugyfel"
+                }
+            }
+        },
+        "handler.returnRequest": {
+            "type": "object",
+            "required": [
+                "condition_at_return"
+            ],
+            "properties": {
+                "condition_at_return": {
+                    "enum": [
+                        "NEW",
+                        "GOOD",
+                        "FAIR",
+                        "POOR",
+                        "DAMAGED"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.Condition"
+                        }
+                    ]
+                },
+                "operating_hours": {
+                    "type": "number",
+                    "example": 6.5
+                },
+                "returned_at": {
+                    "description": "defaults to now",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.startMaintenanceRequest": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Chain sharpening"
+                },
+                "performed_by": {
+                    "type": "string",
+                    "example": "toth.gabor"
+                },
+                "started_at": {
+                    "description": "defaults to now",
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "SCHEDULED",
+                        "REPAIR",
+                        "INSPECTION"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.MaintenanceType"
+                        }
+                    ]
+                }
+            }
+        },
+        "handler.toolTypeRequest": {
+            "type": "object",
+            "required": [
+                "category_id",
+                "name"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "daily_rate": {
+                    "type": "number",
+                    "example": 4500
+                },
+                "deposit": {
+                    "type": "number",
+                    "example": 20000
+                },
+                "maintenance_every_days": {
+                    "type": "integer",
+                    "example": 180
+                },
+                "maintenance_every_hours": {
+                    "type": "number",
+                    "example": 50
+                },
+                "maintenance_every_rentals": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "manufacturer": {
+                    "type": "string",
+                    "example": "Bosch"
+                },
+                "model": {
+                    "type": "string",
+                    "example": "GBH 2-28 F"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Rotary hammer (SDS-plus)"
+                },
+                "purchase_price": {
+                    "type": "number",
+                    "example": 120000
+                }
+            }
+        },
+        "handler.updateItemRequest": {
+            "type": "object",
+            "properties": {
+                "condition": {
+                    "enum": [
+                        "NEW",
+                        "GOOD",
+                        "FAIR",
+                        "POOR",
+                        "DAMAGED"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.Condition"
+                        }
+                    ]
+                },
+                "status": {
+                    "enum": [
+                        "AVAILABLE",
+                        "BROKEN",
+                        "RETIRED"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.ToolStatus"
+                        }
+                    ]
+                }
+            }
+        },
+        "handler.updateUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "enum": [
+                        "ADMIN",
+                        "STAFF"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.Role"
+                        }
+                    ]
+                }
+            }
+        },
+        "respond.ErrorBody": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "respond.ErrorEnvelope": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/respond.ErrorBody"
+                }
+            }
+        },
+        "service.Availability": {
+            "type": "object",
+            "properties": {
+                "available_item_ids": {
+                    "description": "free for the whole [from, to)",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "bookable_item_ids": {
+                    "description": "not in maintenance, broken or retired",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "busy": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.BusyInterval"
+                    }
+                },
+                "from": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "string"
+                },
+                "tool_type_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service.ItemUtilization": {
+            "type": "object",
+            "properties": {
+                "capacity_hours": {
+                    "description": "hours the item existed in the window",
+                    "type": "number"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "rental_count": {
+                    "type": "integer"
+                },
+                "rented_hours": {
+                    "type": "number"
+                },
+                "revenue": {
+                    "type": "number"
+                },
+                "status": {
+                    "$ref": "#/definitions/domain.ToolStatus"
+                },
+                "tool_item_id": {
+                    "type": "integer"
+                },
+                "tool_type_id": {
+                    "type": "integer"
+                },
+                "tool_type_name": {
+                    "type": "string"
+                },
+                "utilization": {
+                    "type": "number"
+                }
+            }
+        },
+        "service.PopularReport": {
+            "type": "object",
+            "properties": {
+                "types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.TypeStats"
+                    }
+                },
+                "window": {
+                    "$ref": "#/definitions/service.Window"
+                }
+            }
+        },
+        "service.ProcurementReport": {
+            "type": "object",
+            "properties": {
+                "suggestions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.ProcurementSuggestion"
+                    }
+                },
+                "threshold": {
+                    "type": "number"
+                },
+                "window": {
+                    "$ref": "#/definitions/service.Window"
+                }
+            }
+        },
+        "service.ProcurementSuggestion": {
+            "type": "object",
+            "properties": {
+                "category_name": {
+                    "type": "string"
+                },
+                "item_count": {
+                    "description": "items that are not retired",
+                    "type": "integer"
+                },
+                "payback_days": {
+                    "description": "Days to earn back one item's purchase price at the window's revenue per item.",
+                    "type": "integer"
+                },
+                "purchase_price": {
+                    "description": "per item",
+                    "type": "number"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "rental_count": {
+                    "description": "rentals started in the window",
+                    "type": "integer"
+                },
+                "rented_hours": {
+                    "description": "over non-retired items",
+                    "type": "number"
+                },
+                "revenue": {
+                    "description": "fees of rentals returned in the window",
+                    "type": "number"
+                },
+                "suggested_additional": {
+                    "type": "integer"
+                },
+                "tool_type_id": {
+                    "type": "integer"
+                },
+                "tool_type_name": {
+                    "type": "string"
+                },
+                "utilization": {
+                    "description": "rented / capacity hours, 0..1",
+                    "type": "number"
+                }
+            }
+        },
+        "service.ReturnResult": {
+            "type": "object",
+            "properties": {
+                "fees": {
+                    "$ref": "#/definitions/domain.Fees"
+                },
+                "rental": {
+                    "$ref": "#/definitions/domain.Rental"
+                }
+            }
+        },
+        "service.Session": {
+            "type": "object",
+            "properties": {
+                "customer": {
+                    "$ref": "#/definitions/domain.Customer"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/domain.User"
+                }
+            }
+        },
+        "service.ToolItemDetail": {
+            "type": "object",
+            "properties": {
+                "acquired_at": {
+                    "type": "string"
+                },
+                "current_condition": {
+                    "$ref": "#/definitions/domain.Condition"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "maintenance": {
+                    "$ref": "#/definitions/domain.MaintenanceDue"
+                },
+                "status": {
+                    "$ref": "#/definitions/domain.ToolStatus"
+                },
+                "tool_type_id": {
+                    "type": "integer"
+                },
+                "tool_type_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.TypeStats": {
+            "type": "object",
+            "properties": {
+                "category_name": {
+                    "type": "string"
+                },
+                "item_count": {
+                    "description": "items that are not retired",
+                    "type": "integer"
+                },
+                "purchase_price": {
+                    "description": "per item",
+                    "type": "number"
+                },
+                "rental_count": {
+                    "description": "rentals started in the window",
+                    "type": "integer"
+                },
+                "rented_hours": {
+                    "description": "over non-retired items",
+                    "type": "number"
+                },
+                "revenue": {
+                    "description": "fees of rentals returned in the window",
+                    "type": "number"
+                },
+                "tool_type_id": {
+                    "type": "integer"
+                },
+                "tool_type_name": {
+                    "type": "string"
+                },
+                "utilization": {
+                    "description": "rented / capacity hours, 0..1",
+                    "type": "number"
+                }
+            }
+        },
+        "service.UtilizationReport": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.ItemUtilization"
+                    }
+                },
+                "total_revenue": {
+                    "type": "number"
+                },
+                "types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.TypeStats"
+                    }
+                },
+                "window": {
+                    "$ref": "#/definitions/service.Window"
+                }
+            }
+        },
+        "service.Window": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "\"Bearer \u003ctoken\u003e\" from POST /api/auth/login",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }
