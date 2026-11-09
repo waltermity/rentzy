@@ -12,6 +12,7 @@ Install once per machine:
 | Go 1.22+ | https://go.dev/dl/ | `brew install go` | `go version` |
 | Docker Desktop | https://docker.com | `brew install --cask docker` | `docker --version` |
 | make | `choco install make` | `brew install make` | `make --version` |
+| Node.js 20.19+ or 22.12+ (frontend) | https://nodejs.org | `brew install node` | `node -v` |
 
 ## Getting Started
 
@@ -25,8 +26,11 @@ From a fresh clone, at the repo root:
 #    and JWT_SECRET (at least 32 chars: openssl rand -hex 32)
 cp .env.example .env          # Windows PowerShell: Copy-Item .env.example .env
 
-# 2. Every time: start everything
+# 2. Every time: start the database + API
 make dev
+
+# 3. In a second terminal: start the frontend
+make web
 ```
 
 `make dev` starts Postgres, waits until it is ready, applies the migrations, loads
@@ -34,13 +38,17 @@ the sample data **only if the database is empty** (your own data is never
 overwritten), and runs the API in the foreground (Ctrl+C stops the API; Postgres
 keeps running, `make docker-down` stops it).
 
+`make web` installs the frontend dependencies on first run and starts Vite. It
+forwards `/api` to the API on port 8080, so start `make dev` first.
+
 Then open:
 
+- App (Vue frontend): http://localhost:5173
 - API docs (Swagger UI): http://localhost:8080/docs
 - Health check: `make health` → `{"data":{"status":"ok"}}`
 
 Sample users (password `Rentzy123!`): `nemeth.andras` (ADMIN), `toth.gabor` (STAFF),
-`kovacs.anna` (CUSTOMER). In Swagger, log in with `POST /api/auth/login`, click
+`kovacs.anna` (CUSTOMER). Visitors can browse the catalog without logging in. In Swagger, log in with `POST /api/auth/login`, click
 **Authorize** and paste `Bearer <token>`.
 
 ### Step by step
@@ -156,8 +164,36 @@ rentzy/
 │       └── seed/
 │           └── seed_sample_data.sql   # dev sample data (make seed)
 │
-├── frontend/
-│   └── ...
+├── frontend/                          # Vue 3 + TypeScript + Pinia + PrimeVue 4
+│   ├── package.json
+│   ├── vite.config.ts                 # dev server, /api proxy to :8080
+│   ├── index.html
+│   └── src/
+│       ├── main.ts                    # app setup, PrimeVue theme, session restore
+│       ├── App.vue
+│       ├── style.css                  # global layout tokens (light + dark)
+│       ├── api/
+│       │   ├── client.ts              # axios instance, JWT header, error handling
+│       │   ├── index.ts               # one function per API endpoint
+│       │   └── types.ts               # mirrors the Go JSON types
+│       ├── stores/                    # Pinia
+│       │   ├── auth.ts                # JWT, user, role
+│       │   ├── tools.ts               # catalog cache
+│       │   ├── reservations.ts        # customer's reservations and rentals
+│       │   └── rentals.ts             # staff handover / return
+│       ├── router/index.ts            # routes + role guards
+│       ├── components/                # header, status tag, maintenance dialog
+│       ├── i18n/hu.ts                 # Hungarian enum names, PrimeVue locale, error texts
+│       ├── utils/                     # formatting, toasts, status colours
+│       └── views/
+│           ├── CatalogView.vue        # public
+│           ├── ToolDetailView.vue     # public, availability calendar + reserve
+│           ├── LoginView.vue
+│           ├── RegisterView.vue
+│           ├── ProfileView.vue        # any logged-in user
+│           ├── NotFoundView.vue
+│           ├── staff/                 # Rentals, Customers, Maintenance
+│           └── admin/                 # Tools, Users, Reports
 │
 └── docs/
     ├── architecture.md
@@ -182,6 +218,8 @@ All run from the **repo root**:
 | `make migrate-up` | Apply migrations (golang-migrate in Docker, needs `make docker-up`) |
 | `make migrate-down` | Roll back the last migration |
 | `make seed` | Load dev sample data (after `migrate-up`) |
+| `make web` | Start the frontend dev server on :5173 (needs `make dev` running) |
+| `make web-build` | Typecheck and build the frontend to `frontend/dist` |
 | `make swagger` | Regenerate the API docs served at `/docs` |
 
 ## Backend configuration (`.env`)

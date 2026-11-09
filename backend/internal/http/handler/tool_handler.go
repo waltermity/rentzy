@@ -26,7 +26,6 @@ type categoryRequest struct {
 // @Summary   List categories
 // @Tags      tools
 // @Produce   json
-// @Security  BearerAuth
 // @Success   200  {object}  object{data=[]domain.Category}
 // @Router    /api/categories [get]
 func (h *ToolHandler) ListCategories(c *gin.Context) {
@@ -118,7 +117,6 @@ func (r toolTypeRequest) input() service.ToolTypeInput {
 // @Summary   List tool types
 // @Tags      tools
 // @Produce   json
-// @Security  BearerAuth
 // @Param     category_id  query     int     false  "Filter by category"
 // @Param     q            query     string  false  "Search in name, manufacturer, model"
 // @Success   200          {object}  object{data=[]domain.ToolType}
@@ -140,7 +138,6 @@ func (h *ToolHandler) ListTypes(c *gin.Context) {
 // @Summary   Get tool type
 // @Tags      tools
 // @Produce   json
-// @Security  BearerAuth
 // @Param     id   path      int  true  "Tool type id"
 // @Success   200  {object}  object{data=domain.ToolType}
 // @Failure   404  {object}  respond.ErrorEnvelope
@@ -215,7 +212,6 @@ func (h *ToolHandler) UpdateType(c *gin.Context) {
 // @Description  Busy intervals (open reservations and rentals) of the type's items in [from, to), the items that can be booked at all, and those free for the whole period.
 // @Tags         tools
 // @Produce      json
-// @Security     BearerAuth
 // @Param        id    path      int     true  "Tool type id"
 // @Param        from  query     string  true  "RFC 3339 or YYYY-MM-DD"
 // @Param        to    query     string  true  "RFC 3339 or YYYY-MM-DD"

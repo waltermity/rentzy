@@ -1,9 +1,11 @@
-.PHONY: help dev env-check db-wait seed-if-empty run build test lint vet tidy docker-up docker-down health migrate-up migrate-down seed swagger
+.PHONY: help dev env-check db-wait seed-if-empty run build test lint vet tidy docker-up docker-down health migrate-up migrate-down seed swagger web web-install web-build
 
 help:
 	@echo Available targets:
 	@echo   make help        List all targets
 	@echo   make dev         ONE COMMAND: start postgres, migrate, seed if empty, run the API
+	@echo   make web         Start the Vue frontend on http://localhost:5173, second terminal
+	@echo   make web-build   Typecheck and build the frontend to frontend/dist
 	@echo   make run         Start the API server
 	@echo   make build       Build binary to ./bin/rentzy
 	@echo   make vet         Run go vet
@@ -39,6 +41,19 @@ health:
 
 swagger:
 	cd backend && go run github.com/swaggo/swag/cmd/swag@v1.16.6 init -g cmd/rentzy/main.go -o docs --overridesFile .swaggo
+
+# ---------- frontend ----------
+
+# Installs dependencies on first run (or after package-lock.json changes).
+web-install:
+	@cd frontend && if [ ! -d node_modules ] || [ package-lock.json -nt node_modules ]; then npm ci; fi
+
+# Vite dev server; /api is proxied to the Go API on :8080 (run `make dev` first).
+web: web-install
+	cd frontend && npm run dev
+
+web-build: web-install
+	cd frontend && npm run build
 
 # Migrations run with the migrate/migrate Docker image on the compose network,
 # so nothing has to be installed locally. Values come from .env.

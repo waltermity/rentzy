@@ -206,11 +206,6 @@ const docTemplate = `{
         },
         "/api/categories": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1622,11 +1617,6 @@ const docTemplate = `{
         },
         "/api/tool-types": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1715,11 +1705,6 @@ const docTemplate = `{
         },
         "/api/tool-types/{id}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1819,11 +1804,6 @@ const docTemplate = `{
         },
         "/api/tool-types/{id}/availability": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Busy intervals (open reservations and rentals) of the type's items in [from, to), the items that can be booked at all, and those free for the whole period.",
                 "produces": [
                     "application/json"

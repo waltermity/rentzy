@@ -30,9 +30,10 @@ type Services struct {
 // NewRouter wires all HTTP routes and returns the configured Gin engine.
 //
 // Access (RBAC):
-//   - public: health, docs, login, register
-//   - any logged-in user: own profile, catalog, availability, own reservations
-//     and rentals (customers see only their own)
+//   - public: health, docs, login, register, catalog (categories, tool
+//     types) and availability
+//   - any logged-in user: own profile, own reservations and rentals
+//     (customers see only their own)
 //   - STAFF + ADMIN: customers (read), tool items, handover/return,
 //     maintenance (read), popular-tools report
 //   - ADMIN: catalog and item management, customer and user management,
@@ -66,6 +67,11 @@ func NewRouter(pool *pgxpool.Pool, s Services) *gin.Engine {
 	api := r.Group("/api")
 	api.POST("/auth/login", authH.Login)
 	api.POST("/auth/register", authH.Register)
+	// Public catalog: visitors can browse tools and free dates before logging in.
+	api.GET("/categories", toolH.ListCategories)
+	api.GET("/tool-types", toolH.ListTypes)
+	api.GET("/tool-types/:id", toolH.GetType)
+	api.GET("/tool-types/:id/availability", toolH.Availability)
 
 	authed := api.Group("", middleware.Auth(s.Auth))
 	staff := authed.Group("", middleware.RequireRoles(domain.RoleStaff, domain.RoleAdmin))
@@ -74,10 +80,6 @@ func NewRouter(pool *pgxpool.Pool, s Services) *gin.Engine {
 	// any logged-in user
 	authed.GET("/auth/me", authH.Me)
 	authed.POST("/auth/password", authH.ChangePassword)
-	authed.GET("/categories", toolH.ListCategories)
-	authed.GET("/tool-types", toolH.ListTypes)
-	authed.GET("/tool-types/:id", toolH.GetType)
-	authed.GET("/tool-types/:id/availability", toolH.Availability)
 	authed.GET("/customers/:id", customerH.Get)
 	authed.POST("/reservations", reservationH.Create)
 	authed.GET("/reservations", reservationH.List)

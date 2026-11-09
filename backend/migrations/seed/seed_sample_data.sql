@@ -38,27 +38,27 @@ INSERT INTO users (id, username, email, password_hash, role, created_at) VALUES
 ON CONFLICT DO NOTHING;
 
 INSERT INTO categories (id, name) VALUES
-    (1, 'Drilling & Demolition'),
-    (2, 'Sawing & Cutting'),
-    (3, 'Grinding & Sanding'),
-    (4, 'Garden & Outdoor'),
-    (5, 'Cleaning')
+    (1, 'Fúrás és bontás'),
+    (2, 'Fűrészelés és vágás'),
+    (3, 'Csiszolás'),
+    (4, 'Kert és szabadtér'),
+    (5, 'Takarítás')
 ON CONFLICT DO NOTHING;
 
 -- Prices in HUF.
 INSERT INTO tool_types (id, name, category_id, manufacturer, model, purchase_price, daily_rate, deposit) VALUES
-    (1,  'Rotary hammer (SDS-plus)',      1, 'Bosch',   'GBH 2-28 F',        120000.00, 4500.00, 20000.00),
-    (2,  'Demolition hammer (SDS-max)',   1, 'Makita',  'HM1317C',           395000.00, 9000.00, 60000.00),
-    (3,  'Cordless combi drill 18 V',     1, 'Bosch',   'GSB 18V-55',         89000.00, 3000.00, 15000.00),
-    (4,  'Circular saw 190 mm',           2, 'Makita',  'HS7601',             52000.00, 3500.00, 15000.00),
-    (5,  'Jigsaw',                        2, 'Bosch',   'GST 90 BE',          54000.00, 2500.00, 10000.00),
-    (6,  'Table saw 210 mm',              2, 'DeWalt',  'DWE7485',           229000.00, 7500.00, 40000.00),
-    (7,  'Angle grinder 230 mm',          3, 'Makita',  'GA9020',             46000.00, 3000.00, 10000.00),
-    (8,  'Random orbital sander 150 mm',  3, 'Festool', 'ETS 150/3 EQ',      189000.00, 5000.00, 30000.00),
-    (9,  'Chainsaw 35 cm',                4, 'Stihl',   'MS 180',            119000.00, 6500.00, 30000.00),
-    (10, 'Brushcutter',                   4, 'Stihl',   'FS 55',              99000.00, 5000.00, 25000.00),
-    (11, 'Pressure washer',               5, 'Kärcher', 'K 5 Power Control', 124000.00, 5500.00, 25000.00),
-    (12, 'Carpet and upholstery cleaner', 5, 'Kärcher', 'Puzzi 10/1',        285000.00, 8000.00, 40000.00)
+    (1,  'Fúrókalapács (SDS-plus)',       1, 'Bosch',   'GBH 2-28 F',        120000.00, 4500.00, 20000.00),
+    (2,  'Bontókalapács (SDS-max)',       1, 'Makita',  'HM1317C',           395000.00, 9000.00, 60000.00),
+    (3,  'Akkus ütvefúró-csavarozó 18 V', 1, 'Bosch',   'GSB 18V-55',         89000.00, 3000.00, 15000.00),
+    (4,  'Kézi körfűrész 190 mm',         2, 'Makita',  'HS7601',             52000.00, 3500.00, 15000.00),
+    (5,  'Szúrófűrész',                   2, 'Bosch',   'GST 90 BE',          54000.00, 2500.00, 10000.00),
+    (6,  'Asztali körfűrész 210 mm',      2, 'DeWalt',  'DWE7485',           229000.00, 7500.00, 40000.00),
+    (7,  'Sarokcsiszoló 230 mm',          3, 'Makita',  'GA9020',             46000.00, 3000.00, 10000.00),
+    (8,  'Excentercsiszoló 150 mm',       3, 'Festool', 'ETS 150/3 EQ',      189000.00, 5000.00, 30000.00),
+    (9,  'Láncfűrész 35 cm',              4, 'Stihl',   'MS 180',            119000.00, 6500.00, 30000.00),
+    (10, 'Fűkasza',                       4, 'Stihl',   'FS 55',              99000.00, 5000.00, 25000.00),
+    (11, 'Magasnyomású mosó',             5, 'Kärcher', 'K 5 Power Control', 124000.00, 5500.00, 25000.00),
+    (12, 'Szőnyeg- és kárpittisztító',    5, 'Kärcher', 'Puzzi 10/1',        285000.00, 8000.00, 40000.00)
 ON CONFLICT DO NOTHING;
 
 -- Status on 2026-11-06:
@@ -181,14 +181,14 @@ ON CONFLICT DO NOTHING;
 
 -- Records without completed_at are still open (tool_items 5, 15 and 19).
 INSERT INTO maintenance (id, tool_item_id, type, description, started_at, completed_at, cost, performed_by) VALUES
-    (1, 3,  'INSPECTION', 'Returned with heavy chuck play. Gearbox worn; repair not economical, tool retired.', '2026-10-01 09:00:00+02', '2026-10-01 10:30:00+02', 0.00,     'toth.gabor'),
-    (2, 17, 'SCHEDULED',  'Seasonal service: new spark plug, air filter cleaned, trimmer head replaced.',        '2026-10-13 08:00:00+02', '2026-10-13 11:30:00+02', 6500.00,  'fekete.laszlo'),
-    (3, 13, 'INSPECTION', 'Returned smoking. Motor armature burnt out; waiting for a spare part.',               '2026-10-14 10:00:00+02', '2026-10-14 10:45:00+02', 0.00,     'papp.judit'),
-    (4, 11, 'SCHEDULED',  'New 210 mm carbide blade fitted; fence and blade alignment checked.',                 '2026-10-19 10:00:00+02', '2026-10-19 12:00:00+02', 12900.00, 'fekete.laszlo'),
-    (5, 6,  'REPAIR',     'Chuck slipping under load; keyless chuck replaced.',                                  '2026-10-23 11:00:00+02', '2026-10-24 12:00:00+02', 7900.00,  'toth.gabor'),
-    (6, 19, 'REPAIR',     'Pump leaking after rental; replacing high-pressure seals (parts ordered).',          '2026-11-02 11:00:00+01', NULL,                     0.00,     'toth.gabor'),
-    (7, 15, 'SCHEDULED',  'Chain sharpening, guide bar dressing, air filter and sprocket check.',                '2026-11-04 09:00:00+01', NULL,                     0.00,     'fekete.laszlo'),
-    (8, 5,  'INSPECTION', 'Annual electrical safety test (insulation and earth continuity).',                    '2026-11-06 08:00:00+01', NULL,                     0.00,     'papp.judit')
+    (1, 3,  'INSPECTION', 'Erős tokmány-holtjátékkal jött vissza. A hajtómű kopott, a javítás nem gazdaságos, az eszközt kivontuk a forgalomból.', '2026-10-01 09:00:00+02', '2026-10-01 10:30:00+02', 0.00,     'toth.gabor'),
+    (2, 17, 'SCHEDULED',  'Szezonális szerviz: új gyújtógyertya, légszűrő tisztítva, damilfej cserélve.',        '2026-10-13 08:00:00+02', '2026-10-13 11:30:00+02', 6500.00,  'fekete.laszlo'),
+    (3, 13, 'INSPECTION', 'Füstölve jött vissza. A motor forgórésze leégett, alkatrészre vár.',               '2026-10-14 10:00:00+02', '2026-10-14 10:45:00+02', 0.00,     'papp.judit'),
+    (4, 11, 'SCHEDULED',  'Új 210 mm-es keményfém fűrészlap felszerelve, párhuzamvezető és lapbeállítás ellenőrizve.',                 '2026-10-19 10:00:00+02', '2026-10-19 12:00:00+02', 12900.00, 'fekete.laszlo'),
+    (5, 6,  'REPAIR',     'A tokmány terhelés alatt megcsúszott, gyorstokmány cserélve.',                                  '2026-10-23 11:00:00+02', '2026-10-24 12:00:00+02', 7900.00,  'toth.gabor'),
+    (6, 19, 'REPAIR',     'Kölcsönzés után szivárog a szivattyú, a nagynyomású tömítések cseréje folyamatban (alkatrész megrendelve).',          '2026-11-02 11:00:00+01', NULL,                     0.00,     'toth.gabor'),
+    (7, 15, 'SCHEDULED',  'Láncélezés, láncvezető sorjázása, légszűrő és lánckerék ellenőrzése.',                '2026-11-04 09:00:00+01', NULL,                     0.00,     'fekete.laszlo'),
+    (8, 5,  'INSPECTION', 'Éves érintésvédelmi felülvizsgálat (szigetelés és védővezető folytonosság).',                    '2026-11-06 08:00:00+01', NULL,                     0.00,     'papp.judit')
 ON CONFLICT DO NOTHING;
 
 -- Needs migration 000002. Link every CUSTOMER login to its customer record by email.

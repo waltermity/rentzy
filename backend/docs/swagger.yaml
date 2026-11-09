@@ -962,8 +962,6 @@ paths:
                   $ref: '#/definitions/domain.Category'
                 type: array
             type: object
-      security:
-      - BearerAuth: []
       summary: List categories
       tags:
       - tools
@@ -1857,8 +1855,6 @@ paths:
                   $ref: '#/definitions/domain.ToolType'
                 type: array
             type: object
-      security:
-      - BearerAuth: []
       summary: List tool types
       tags:
       - tools
@@ -1913,8 +1909,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/respond.ErrorEnvelope'
-      security:
-      - BearerAuth: []
       summary: Get tool type
       tags:
       - tools
@@ -1991,8 +1985,6 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/respond.ErrorEnvelope'
-      security:
-      - BearerAuth: []
       summary: Tool type availability
       tags:
       - tools
