@@ -33,6 +33,16 @@ CREATE TABLE customers (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE users (
+    id            BIGSERIAL PRIMARY KEY,
+    username      TEXT NOT NULL UNIQUE,
+    email         TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role          TEXT NOT NULL DEFAULT 'CUSTOMER',
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT users_role_check CHECK (role IN ('ADMIN','STAFF','CUSTOMER'))
+);
+
 CREATE TABLE reservations (
     id           BIGSERIAL PRIMARY KEY,
     customer_id  BIGINT NOT NULL REFERENCES customers(id),
@@ -44,7 +54,10 @@ CREATE TABLE reservations (
     CONSTRAINT reservations_status_check
         CHECK (status IN ('PENDING','CONFIRMED','CANCELLED','CONVERTED','EXPIRED')),
     CONSTRAINT reservations_dates_check
-        CHECK (end_date > start_date)
+        CHECK (end_date > start_date),
+    -- Target of rentals_reservation_fkey. id alone is already unique.
+    CONSTRAINT reservations_id_customer_tool_key
+        UNIQUE (id, customer_id, tool_item_id)
 );
 
 CREATE INDEX idx_reservations_tool_item_dates
@@ -54,7 +67,8 @@ CREATE TABLE rentals (
     id                    BIGSERIAL PRIMARY KEY,
     customer_id           BIGINT NOT NULL REFERENCES customers(id),
     tool_item_id          BIGINT NOT NULL REFERENCES tool_items(id),
-    reservation_id        BIGINT REFERENCES reservations(id),
+    reservation_id        BIGINT NOT NULL,
+    staff_id              BIGINT NOT NULL REFERENCES users(id), -- staff member who handed the tool over
     start_date            TIMESTAMPTZ NOT NULL,
     expected_end_date     TIMESTAMPTZ NOT NULL,
     actual_end_date       TIMESTAMPTZ,
@@ -65,8 +79,16 @@ CREATE TABLE rentals (
     late_fee              NUMERIC(12,2),
     total_fee             NUMERIC(12,2),
     status                TEXT NOT NULL DEFAULT 'ACTIVE',
+    -- A reservation becomes at most one rental.
+    CONSTRAINT rentals_reservation_id_key UNIQUE (reservation_id),
+    -- The rental belongs to the same customer and tool item as its reservation.
+    CONSTRAINT rentals_reservation_fkey
+        FOREIGN KEY (reservation_id, customer_id, tool_item_id)
+        REFERENCES reservations (id, customer_id, tool_item_id),
     CONSTRAINT rentals_status_check
-        CHECK (status IN ('ACTIVE','RETURNED','OVERDUE','CANCELLED'))
+        CHECK (status IN ('ACTIVE','RETURNED','OVERDUE','CANCELLED')),
+    CONSTRAINT rentals_dates_check
+        CHECK (expected_end_date > start_date)
 );
 
 CREATE INDEX idx_rentals_tool_item_dates

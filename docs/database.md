@@ -25,6 +25,7 @@ erDiagram
     TOOL_ITEMS   ||--o{ RENTALS      : "rented as"
     TOOL_ITEMS   ||--o{ MAINTENANCE  : "serviced by"
     RESERVATIONS ||--o| RENTALS      : "may become"
+    USERS        ||--o{ RENTALS      : "hands out"
 
     CATEGORIES {
         bigserial id PK
@@ -68,7 +69,8 @@ erDiagram
         bigserial    id PK
         bigint       customer_id FK
         bigint       tool_item_id FK
-        bigint       reservation_id FK
+        bigint       reservation_id FK, UK
+        bigint       staff_id FK
         timestamptz  start_date
         timestamptz  expected_end_date
         timestamptz  actual_end_date
@@ -89,4 +91,12 @@ erDiagram
         timestamptz  completed_at
         numeric      cost
         text         performed_by
+    }
+    USERS {
+        bigserial    id PK
+        text         username UK
+        text         email UK
+        text         password_hash
+        text         role
+        timestamptz  created_at
     }
