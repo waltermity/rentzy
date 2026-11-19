@@ -1,0 +1,32 @@
+{
+  "name": "rentzy-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc -b"
+  },
+  "dependencies": {
+    "@primeuix/themes": "2.0.3",
+    "axios": "^1.21.0",
+    "pinia": "^4.1.0",
+    "primeicons": "7.0.0",
+    "primevue": "4.5.5",
+    "vue": "^3.5.45",
+    "vue-router": "^5.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/tsconfig": "^0.9.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.7",
+    "vue-tsc": "^3.3.14"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

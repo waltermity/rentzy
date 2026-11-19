@@ -26,6 +26,7 @@ erDiagram
     TOOL_ITEMS   ||--o{ MAINTENANCE  : "serviced by"
     RESERVATIONS ||--o| RENTALS      : "may become"
     USERS        ||--o{ RENTALS      : "hands out"
+    CUSTOMERS    |o--o| USERS        : "logs in as"
 
     CATEGORIES {
         bigserial id PK
@@ -40,6 +41,9 @@ erDiagram
         numeric      purchase_price
         numeric      daily_rate
         numeric      deposit
+        int          maintenance_every_rentals
+        int          maintenance_every_days
+        numeric      maintenance_every_hours
     }
     TOOL_ITEMS {
         bigserial    id PK
@@ -80,6 +84,7 @@ erDiagram
         numeric      base_fee
         numeric      late_fee
         numeric      total_fee
+        numeric      operating_hours
         text         status
     }
     MAINTENANCE {
@@ -98,5 +103,6 @@ erDiagram
         text         email UK
         text         password_hash
         text         role
+        bigint       customer_id FK, UK
         timestamptz  created_at
     }
