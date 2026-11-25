@@ -49,17 +49,18 @@ func (s *ReportService) ResolveWindow(from, to *time.Time) (Window, error) {
 
 // TypeStats aggregates ItemStats per tool type.
 type TypeStats struct {
-	ToolTypeID   int64           `json:"tool_type_id"`
-	ToolTypeName string          `json:"tool_type_name"`
-	CategoryName string          `json:"category_name"`
-	ItemCount    int             `json:"item_count"`     // items that are not retired
-	RentalCount  int             `json:"rental_count"`   // rentals started in the window
-	RentedHours  float64         `json:"rented_hours"`   // over non-retired items
-	Utilization  float64         `json:"utilization"`    // rented / capacity hours, 0..1
-	Revenue      decimal.Decimal `json:"revenue"`        // fees of rentals returned in the window
-	Expenses     decimal.Decimal `json:"expenses"`       // maintenance cost completed in the window
-	PurchaseCost decimal.Decimal `json:"purchase_price"` // per item
-	capacity     float64
+	ToolTypeID       int64           `json:"tool_type_id"`
+	ToolTypeName     string          `json:"tool_type_name"`
+	CategoryName     string          `json:"category_name"`
+	ItemCount        int             `json:"item_count"`        // items that are not retired
+	RentalCount      int             `json:"rental_count"`      // rentals started in the window
+	RentedHours      float64         `json:"rented_hours"`      // over non-retired items
+	Utilization      float64         `json:"utilization"`       // rented / capacity hours, 0..1
+	Revenue          decimal.Decimal `json:"revenue"`           // fees of rentals returned in the window
+	Expenses         decimal.Decimal `json:"expenses"`          // maintenance cost completed in the window
+	RetainedDeposits decimal.Decimal `json:"retained_deposits"` // deposits retained in the window
+	PurchaseCost     decimal.Decimal `json:"purchase_price"`    // per item
+	capacity         float64
 }
 
 // ItemUtilization is one item's figures with its utilization.
@@ -82,13 +83,14 @@ func aggregate(stats []domain.ItemStats) []TypeStats {
 		t, ok := byType[s.ToolTypeID]
 		if !ok {
 			t = &TypeStats{ToolTypeID: s.ToolTypeID, ToolTypeName: s.ToolTypeName, CategoryName: s.CategoryName,
-				PurchaseCost: s.PurchasePrice, Revenue: decimal.Zero, Expenses: decimal.Zero}
+				PurchaseCost: s.PurchasePrice, Revenue: decimal.Zero, Expenses: decimal.Zero, RetainedDeposits: decimal.Zero}
 			byType[s.ToolTypeID] = t
 			order = append(order, s.ToolTypeID)
 		}
 		t.RentalCount += s.RentalCount
 		t.Revenue = t.Revenue.Add(s.Revenue)
 		t.Expenses = t.Expenses.Add(s.Expenses)
+		t.RetainedDeposits = t.RetainedDeposits.Add(s.RetainedDeposits)
 		if s.Status != domain.ToolRetired {
 			t.ItemCount++
 			t.RentedHours += s.RentedHours
@@ -130,11 +132,12 @@ func (s *ReportService) Popular(ctx context.Context, w Window, limit int) (Popul
 }
 
 type UtilizationReport struct {
-	Window       Window            `json:"window"`
-	TotalRevenue decimal.Decimal   `json:"total_revenue"`
-	TotalExpenses decimal.Decimal   `json:"total_expenses"`
-	Types        []TypeStats       `json:"types"`
-	Items        []ItemUtilization `json:"items"`
+	Window                Window            `json:"window"`
+	TotalRevenue          decimal.Decimal   `json:"total_revenue"`
+	TotalExpenses         decimal.Decimal   `json:"total_expenses"`
+	TotalRetainedDeposits decimal.Decimal   `json:"total_retained_deposits"`
+	Types                 []TypeStats       `json:"types"`
+	Items                 []ItemUtilization `json:"items"`
 }
 
 // Utilization gives utilization and revenue per tool type and per item.
@@ -143,11 +146,12 @@ func (s *ReportService) Utilization(ctx context.Context, w Window) (UtilizationR
 	if err != nil {
 		return UtilizationReport{}, err
 	}
-	rep := UtilizationReport{Window: w, TotalRevenue: decimal.Zero, TotalExpenses: decimal.Zero, Types: aggregate(stats),
+	rep := UtilizationReport{Window: w, TotalRevenue: decimal.Zero, TotalExpenses: decimal.Zero, TotalRetainedDeposits: decimal.Zero, Types: aggregate(stats),
 		Items: make([]ItemUtilization, 0, len(stats))}
 	for _, st := range stats {
 		rep.TotalRevenue = rep.TotalRevenue.Add(st.Revenue)
 		rep.TotalExpenses = rep.TotalExpenses.Add(st.Expenses)
+		rep.TotalRetainedDeposits = rep.TotalRetainedDeposits.Add(st.RetainedDeposits)
 		st.RentedHours = math.Round(st.RentedHours*100) / 100
 		st.CapacityHours = math.Round(st.CapacityHours*100) / 100
 		rep.Items = append(rep.Items, ItemUtilization{ItemStats: st, Utilization: ratio(st.RentedHours, st.CapacityHours)})
