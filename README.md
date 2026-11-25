@@ -217,7 +217,7 @@ All run from the **repo root**:
 | `make docker-down` | Stop Postgres (keeps data volume) |
 | `make migrate-up` | Apply migrations (golang-migrate in Docker, needs `make docker-up`) |
 | `make migrate-down` | Roll back the last migration |
-| `make seed` | Load dev sample data (after `migrate-up`) |
+| `make seed` | Load dev sample data (after `migrate-up`). Dates are moved to today. Run it again to refresh an already seeded database (`make dev` only seeds an empty one) |
 | `make web` | Start the frontend dev server on :5173 (needs `make dev` running) |
 | `make web-build` | Typecheck and build the frontend to `frontend/dist` |
 | `make swagger` | Regenerate the API docs served at `/docs` |
