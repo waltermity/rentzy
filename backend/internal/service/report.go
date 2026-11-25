@@ -57,6 +57,7 @@ type TypeStats struct {
 	RentedHours  float64         `json:"rented_hours"`   // over non-retired items
 	Utilization  float64         `json:"utilization"`    // rented / capacity hours, 0..1
 	Revenue      decimal.Decimal `json:"revenue"`        // fees of rentals returned in the window
+	Expenses     decimal.Decimal `json:"expenses"`       // maintenance cost completed in the window
 	PurchaseCost decimal.Decimal `json:"purchase_price"` // per item
 	capacity     float64
 }
@@ -81,12 +82,13 @@ func aggregate(stats []domain.ItemStats) []TypeStats {
 		t, ok := byType[s.ToolTypeID]
 		if !ok {
 			t = &TypeStats{ToolTypeID: s.ToolTypeID, ToolTypeName: s.ToolTypeName, CategoryName: s.CategoryName,
-				PurchaseCost: s.PurchasePrice, Revenue: decimal.Zero}
+				PurchaseCost: s.PurchasePrice, Revenue: decimal.Zero, Expenses: decimal.Zero}
 			byType[s.ToolTypeID] = t
 			order = append(order, s.ToolTypeID)
 		}
 		t.RentalCount += s.RentalCount
 		t.Revenue = t.Revenue.Add(s.Revenue)
+		t.Expenses = t.Expenses.Add(s.Expenses)
 		if s.Status != domain.ToolRetired {
 			t.ItemCount++
 			t.RentedHours += s.RentedHours
@@ -130,6 +132,7 @@ func (s *ReportService) Popular(ctx context.Context, w Window, limit int) (Popul
 type UtilizationReport struct {
 	Window       Window            `json:"window"`
 	TotalRevenue decimal.Decimal   `json:"total_revenue"`
+	TotalExpenses decimal.Decimal   `json:"total_expenses"`
 	Types        []TypeStats       `json:"types"`
 	Items        []ItemUtilization `json:"items"`
 }
@@ -140,10 +143,11 @@ func (s *ReportService) Utilization(ctx context.Context, w Window) (UtilizationR
 	if err != nil {
 		return UtilizationReport{}, err
 	}
-	rep := UtilizationReport{Window: w, TotalRevenue: decimal.Zero, Types: aggregate(stats),
+	rep := UtilizationReport{Window: w, TotalRevenue: decimal.Zero, TotalExpenses: decimal.Zero, Types: aggregate(stats),
 		Items: make([]ItemUtilization, 0, len(stats))}
 	for _, st := range stats {
 		rep.TotalRevenue = rep.TotalRevenue.Add(st.Revenue)
+		rep.TotalExpenses = rep.TotalExpenses.Add(st.Expenses)
 		st.RentedHours = math.Round(st.RentedHours*100) / 100
 		st.CapacityHours = math.Round(st.CapacityHours*100) / 100
 		rep.Items = append(rep.Items, ItemUtilization{ItemStats: st, Utilization: ratio(st.RentedHours, st.CapacityHours)})
