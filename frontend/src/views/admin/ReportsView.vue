@@ -79,7 +79,7 @@ const kpis = computed(() => {
   const rented = u.types.reduce((s, t) => s + t.rented_hours, 0)
   const rentals = u.types.reduce((s, t) => s + t.rental_count, 0)
   const avg = u.types.length ? u.types.reduce((s, t) => s + t.utilization * t.item_count, 0) / Math.max(1, u.types.reduce((s, t) => s + t.item_count, 0)) : 0
-  return { revenue: u.total_revenue, rentals, rentedDays: Math.round(rented / 24), avg }
+  return { revenue: u.total_revenue, expenses: u.total_expenses, rentals, rentedDays: Math.round(rented / 24), avg }
 })
 </script>
 
@@ -101,7 +101,7 @@ const kpis = computed(() => {
 
     <div v-if="kpis" class="kpis">
       <Card><template #content><div class="kpi-label">Bevétel</div><div class="kpi">{{ money(kpis.revenue) }}</div></template></Card>
-      <Card><template #content><div class="kpi-label">Kölcsönzések száma</div><div class="kpi">{{ kpis.rentals }}</div></template></Card>
+      <Card><template #content><div class="kpi-label">Kiadás (karbantartás)</div><div class="kpi">{{ money(kpis.expenses) }}</div></template></Card>      <Card><template #content><div class="kpi-label">Kölcsönzések száma</div><div class="kpi">{{ kpis.rentals }}</div></template></Card>
       <Card><template #content><div class="kpi-label">Kölcsönzési napok</div><div class="kpi">{{ kpis.rentedDays }}</div></template></Card>
       <Card><template #content><div class="kpi-label">Átlagos kihasználtság</div><div class="kpi">{{ percent(kpis.avg) }}</div></template></Card>
     </div>
@@ -109,7 +109,7 @@ const kpis = computed(() => {
     <Tabs v-model:value="tab">
       <TabList>
         <Tab value="popular">Leggyakrabban kölcsönzött</Tab>
-        <Tab v-if="auth.isAdmin" value="util">Kihasználtság és bevétel</Tab>
+        <Tab v-if="auth.isAdmin" value="util">Kihasználtság, bevétel és kiadás</Tab>
         <Tab v-if="auth.isAdmin" value="proc">Beszerzési javaslatok</Tab>
       </TabList>
       <TabPanels>
@@ -147,6 +147,7 @@ const kpis = computed(() => {
               </template>
             </Column>
             <Column header="Bevétel" field="revenue" sortable class="num"><template #body="{ data }">{{ money(data.revenue) }}</template></Column>
+            <Column header="Kiadás" field="expenses" sortable class="num"><template #body="{ data }">{{ money(data.expenses) }}</template></Column>
           </DataTable>
 
           <h3 class="sub">Példányonként</h3>
@@ -166,6 +167,7 @@ const kpis = computed(() => {
               </template>
             </Column>
             <Column header="Bevétel" field="revenue" sortable class="num"><template #body="{ data }">{{ money(data.revenue) }}</template></Column>
+            <Column header="Kiadás" field="expenses" sortable class="num"><template #body="{ data }">{{ money(data.expenses) }}</template></Column>
           </DataTable>
         </TabPanel>
 
@@ -192,6 +194,7 @@ const kpis = computed(() => {
                   <dt>Jelenlegi példányok</dt><dd>{{ s.item_count }}</dd>
                   <dt>Kölcsönzések</dt><dd>{{ s.rental_count }}</dd>
                   <dt>Bevétel</dt><dd>{{ money(s.revenue) }}</dd>
+                  <dt>Kiadás</dt><dd>{{ money(s.expenses) }}</dd>
                   <dt>Ár / példány</dt><dd>{{ money(s.purchase_price) }}</dd>
                   <dt>Megtérülés</dt><dd>{{ s.payback_days != null ? `kb. ${s.payback_days} nap` : '—' }}</dd>
                 </dl>

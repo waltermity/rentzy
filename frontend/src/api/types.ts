@@ -176,6 +176,7 @@ export interface TypeStats {
   rented_hours: number
   utilization: number
   revenue: number
+  expenses: number
   purchase_price: number
 }
 
@@ -189,6 +190,7 @@ export interface ItemUtilization {
   rented_hours: number
   capacity_hours: number
   revenue: number
+  expenses: number
   utilization: number
 }
 
@@ -200,6 +202,7 @@ export interface PopularReport {
 export interface UtilizationReport {
   window: ReportWindow
   total_revenue: number
+  total_expenses: number
   types: TypeStats[]
   items: ItemUtilization[]
 }

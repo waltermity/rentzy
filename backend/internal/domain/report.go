@@ -14,4 +14,5 @@ type ItemStats struct {
 	RentedHours   float64         `json:"rented_hours"`
 	CapacityHours float64         `json:"capacity_hours"` // hours the item existed in the window
 	Revenue       decimal.Decimal `json:"revenue"`
+	Expenses      decimal.Decimal `json:"expenses"` // cost of maintenance completed in the window
 }
