@@ -177,6 +177,7 @@ export interface TypeStats {
   utilization: number
   revenue: number
   expenses: number
+  retained_deposits: number
   purchase_price: number
 }
 
@@ -191,6 +192,7 @@ export interface ItemUtilization {
   capacity_hours: number
   revenue: number
   expenses: number
+  retained_deposits: number
   utilization: number
 }
 
@@ -203,6 +205,7 @@ export interface UtilizationReport {
   window: ReportWindow
   total_revenue: number
   total_expenses: number
+  total_retained_deposits: number
   types: TypeStats[]
   items: ItemUtilization[]
 }

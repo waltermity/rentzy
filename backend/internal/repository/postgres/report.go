@@ -40,7 +40,12 @@ func (r *ReportRepo) ItemStats(ctx context.Context, from, to time.Time) ([]domai
 		          AND r.actual_end_date >= w.f AND r.actual_end_date < w.t_rev),
 			       (SELECT COALESCE(SUM(m.cost), 0) FROM maintenance m
 			        WHERE m.tool_item_id = ti.id
-			          AND m.completed_at >= w.f AND m.completed_at < w.t_rev)
+			          AND m.completed_at >= w.f AND m.completed_at < w.t_rev),
+				   (SELECT COALESCE(SUM(r.deposit_paid), 0) FROM rentals r
+					WHERE r.tool_item_id = ti.id
+					  AND r.status = 'RETURNED'
+					  AND r.condition_at_return = 'DAMAGED'
+					  AND r.actual_end_date >= w.f AND r.actual_end_date < w.t_rev)	
 		FROM tool_items ti
 		JOIN tool_types tt ON tt.id = ti.tool_type_id
 		JOIN categories c  ON c.id  = tt.category_id
@@ -52,7 +57,7 @@ func (r *ReportRepo) ItemStats(ctx context.Context, from, to time.Time) ([]domai
 	out, err := collect(rows, func(row pgx.Rows) (domain.ItemStats, error) {
 		var s domain.ItemStats
 		return s, row.Scan(&s.ToolItemID, &s.ToolTypeID, &s.ToolTypeName, &s.CategoryName, &s.Status,
-			&s.PurchasePrice, &s.RentalCount, &s.RentedHours, &s.CapacityHours, &s.Revenue, &s.Expenses)
+			&s.PurchasePrice, &s.RentalCount, &s.RentedHours, &s.CapacityHours, &s.Revenue, &s.Expenses, &s.RetainedDeposits)
 	})
 	return out, mapErr(err, "item stats")
 }
